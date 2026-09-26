@@ -17,9 +17,10 @@ from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse, StreamingResponse
 import psutil
 
-from backend import __version__
+from backend import __version__, notifier
 from backend.collector import collector
 from backend.probes import probe_all_services
+from backend.security_sentinel import security_sentinel
 from backend.specs import get_hardware_specs
 from backend.team import get_team_roster
 
@@ -217,3 +218,117 @@ async def stream_metrics(request: Request) -> StreamingResponse:
             "Content-Type": "text/event-stream; charset=utf-8",
         },
     )
+
+
+@router.get("/security", summary="VPS Security Telemetry & 4-Layer Defense Status")
+async def get_security() -> Dict[str, Any]:
+    """Endpoint 7: Host Security Telemetry & 4-Layer Intrusion Defense Status.
+
+    Returns Fail2ban intrusion metrics, recent ban events with recidivism counts,
+    firewall operational state, and the active 4-layer defense audit.
+    """
+    try:
+        data = security_sentinel.get_security_status()
+        return _standard_envelope(data)
+    except Exception as exc:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=_error_envelope(
+                "SECURITY_TELEMETRY_ERROR",
+                f"Failed to compile security telemetry: {exc}",
+            ),
+        )
+
+
+@router.post("/security/alert/test", summary="Send Test Alert to Telegram Notification Gateway")
+async def test_security_alert(request: Request) -> Dict[str, Any]:
+    """Endpoint 8: Send Test Alert to Telegram Notification Gateway.
+
+    Allows operators and CI pipelines to verify Telegram bot gateway connectivity.
+    Supports optional JSON body: {"type": "security"|"resource"|"service"|"custom", ...}.
+    """
+    try:
+        body: Dict[str, Any] = {}
+        if request.headers.get("content-type", "").startswith("application/json"):
+            try:
+                body = await request.json()
+            except Exception:
+                body = {}
+
+        alert_type = str(body.get("type", "security")).lower()
+        target_chat = body.get("chat_id")
+
+        if alert_type == "resource":
+            success = await notifier.send_resource_alert(
+                resource=body.get("resource", "CPU (Synthetic Test)"),
+                current_val=float(body.get("current_val", 89.4)),
+                threshold=float(body.get("threshold", 85.0)),
+                force=True,
+                chat_id=target_chat,
+            )
+        elif alert_type == "service":
+            success = await notifier.send_service_alert(
+                service=body.get("service", "synthetic-probe"),
+                status=body.get("status", "warning"),
+                details=body.get("details", "Operational health verification test"),
+                force=True,
+                chat_id=target_chat,
+            )
+        elif alert_type == "custom":
+            msg = body.get("message", "🧪 Test ping from Yudiaz Sentinel Bot Gateway")
+            success = await notifier.send_telegram_message(
+                text=f"🧪 <b>[YUDIAZ SENTINEL] MANUAL TEST PING</b>\n\n{msg}",
+                chat_id=target_chat,
+            )
+        else:
+            # Default to security alert
+            success = await notifier.send_security_alert(
+                ip=body.get("ip", "198.51.100.42"),
+                jail=body.get("jail", "sshd"),
+                action=body.get("action", "Ban"),
+                recidive_info=body.get("recidive_info", "Synthetic Test Probe (Gateway Verification)"),
+                force=True,
+                chat_id=target_chat,
+            )
+
+        resp_data = {
+            "delivered": success,
+            "status": "delivered" if success else "failed",
+            "alert_type": alert_type,
+            "details": "Notification delivered to Telegram" if success else "Notification delivery failed or credentials unconfigured",
+        }
+        return _standard_envelope(resp_data)
+    except Exception as exc:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=_error_envelope(
+                "ALERT_TEST_ERROR",
+                f"Failed to process test alert: {exc}",
+            ),
+        )
+
+
+@router.post("/security/digest/trigger", summary="Manually Trigger Daily Ops Telemetry Digest")
+async def trigger_daily_digest() -> Dict[str, Any]:
+    """Endpoint 9: Manually Trigger Daily Ops Telemetry Digest.
+
+    Immediately compiles complete telemetry, security metrics, and services health,
+    and dispatches the daily report to Telegram.
+    """
+    try:
+        success = await security_sentinel.trigger_daily_digest()
+        resp_data = {
+            "delivered": success,
+            "status": "delivered" if success else "failed",
+            "details": "Daily ops digest successfully compiled and dispatched" if success else "Digest dispatch failed or Telegram credentials unconfigured",
+        }
+        return _standard_envelope(resp_data)
+    except Exception as exc:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=_error_envelope(
+                "DIGEST_TRIGGER_ERROR",
+                f"Failed to trigger daily digest: {exc}",
+            ),
+        )
+

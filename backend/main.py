@@ -18,6 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from backend import __app_name__, __version__
 from backend.collector import collector
 from backend.routes import router as api_router
+from backend.security_sentinel import security_sentinel
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = BASE_DIR / "frontend"
@@ -26,10 +27,12 @@ FRONTEND_DIR = BASE_DIR / "frontend"
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Manage application startup and shutdown events cleanly."""
-    # Startup: Initialize and launch background metrics collection worker
+    # Startup: Initialize and launch background metrics collection and security sentinel
     await collector.start()
+    await security_sentinel.start()
     yield
     # Shutdown: Gracefully stop background worker tasks
+    await security_sentinel.stop()
     await collector.stop()
 
 
