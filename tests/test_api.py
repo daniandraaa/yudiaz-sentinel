@@ -135,7 +135,10 @@ def test_projects_endpoint(client: TestClient) -> None:
     assert "deployed_projects" in data
     deployed = data["deployed_projects"]
     assert isinstance(deployed, list)
-    assert len(deployed) == 3
+    assert len(deployed) >= 3
+    deployed_ids = [p["id"] for p in deployed]
+    assert "vps-sentinel" in deployed_ids
+    assert "yudiaz-finance" in deployed_ids
 
     deployed_map = {p["id"]: p for p in deployed}
     expected_ids = ["vps-sentinel", "9router-api", "hermes-core"]
@@ -192,7 +195,9 @@ async def test_probe_deployed_projects() -> None:
     from backend.probes import probe_deployed_projects
 
     projects = await probe_deployed_projects()
-    assert len(projects) == 3
+    assert len(projects) >= 3
+    ids = [p["id"] for p in projects]
+    assert "yudiaz-finance" in ids
     for p in projects:
         assert p["status"] in ("online", "offline")
         assert p["ssl"] == "TLS 1.3 Active"

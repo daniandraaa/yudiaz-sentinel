@@ -252,6 +252,7 @@ def get_deployed_projects(
     sentinel_status: str = "online",
     router_status: str = "online",
     hermes_status: str = "online",
+    finance_status: str = "online",
 ) -> List[Dict[str, Any]]:
     """Return catalog of deployed production projects with live operational status."""
     return [
@@ -266,6 +267,18 @@ def get_deployed_projects(
             "ssl": "TLS 1.3 Active",
             "badge": "LIVE PRODUCTION",
             "internal_port": 9229,
+        },
+        {
+            "id": "yudiaz-finance",
+            "name": "Yudiaz Finance",
+            "domain": "finance.daniandraaa.my.id",
+            "url": "https://finance.daniandraaa.my.id",
+            "category": "Executive Financial Hub",
+            "description": "Executive financial ledger, cash flow observability, and Elara autonomous bookkeeping portal.",
+            "status": finance_status,
+            "ssl": "TLS 1.3 Active",
+            "badge": "NEW DEPLOYMENT",
+            "internal_port": 9339,
         },
         {
             "id": "9router-api",
@@ -296,16 +309,19 @@ def get_deployed_projects(
 
 async def probe_deployed_projects() -> List[Dict[str, Any]]:
     """Probe network status for all deployed production projects independently."""
-    hermes_res, router_res = await asyncio.gather(
+    hermes_res, router_res, finance_res = await asyncio.gather(
         probe_http_service("127.0.0.1", 9119),
         probe_http_service("127.0.0.1", 20128),
+        probe_http_service("127.0.0.1", 9339),
         return_exceptions=True,
     )
     hermes_ok = hermes_res[0] if (isinstance(hermes_res, tuple) and len(hermes_res) >= 1) else False
     router_ok = router_res[0] if (isinstance(router_res, tuple) and len(router_res) >= 1) else False
+    finance_ok = finance_res[0] if (isinstance(finance_res, tuple) and len(finance_res) >= 1) else False
 
     return get_deployed_projects(
         sentinel_status="online",
         router_status="online" if router_ok else "offline",
         hermes_status="online" if hermes_ok else "offline",
+        finance_status="online" if finance_ok else "offline",
     )
