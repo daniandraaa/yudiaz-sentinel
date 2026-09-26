@@ -1,0 +1,45 @@
+# ==============================================================================
+# YUDIAZ SENTINEL INGRESS CONFIGURATION
+# Primary Target: vps.daniandraaa.my.id
+# Fallback Testing Target: vps.20.200.220.190.sslip.io
+# Internal Daemon: 127.0.0.1:9229
+# ==============================================================================
+
+vps.daniandraaa.my.id, vps.20.200.220.190.sslip.io {
+    # Logging configuration
+    log {
+        output file /var/log/caddy/sentinel_access.log {
+            roll_size 10mb
+            roll_keep 5
+        }
+    }
+
+    # Security Headers
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        -Server
+    }
+
+    # Compression for static REST JSON & HTML assets
+    encode zstd gzip
+
+    # Reverse proxy upstream to Sentinel Python Daemon
+    reverse_proxy 127.0.0.1:9229 {
+        # Critical for SSE (Server-Sent Events) live streaming: disable buffering
+        flush_interval -1
+
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+
+        # Keepalive upstream settings
+        transport http {
+            keepalive 60s
+            keepalive_idle_conns 10
+        }
+    }
+}

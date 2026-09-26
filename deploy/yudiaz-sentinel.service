@@ -1,0 +1,38 @@
+[Unit]
+Description=Yudiaz Sentinel VPS Telemetry & Observability Engine
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=daniilham
+Group=daniilham
+WorkingDirectory=/home/daniilham/yudiaz-sentinel
+
+# Environment settings
+Environment="PYTHONUNBUFFERED=1"
+Environment="SENTINEL_HOST=127.0.0.1"
+Environment="SENTINEL_PORT=9229"
+Environment="SENTINEL_ENV=production"
+
+# Execute FastAPI via Uvicorn within uv/python3.12 virtualenv
+ExecStart=/home/daniilham/yudiaz-sentinel/.venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 9229 --workers 1 --log-level info
+
+# Resilience & Auto-recovery
+Restart=always
+RestartSec=5s
+
+# Security sandboxing
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/home/daniilham/yudiaz-sentinel
+
+# Resource limits (Zero overhead guardrails on 54GB RAM)
+MemoryHigh=150M
+MemoryMax=300M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

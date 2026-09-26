@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YUDIAZ SENTINEL // VPS Telemetry & AI Agent Hub</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/yudiaz-logo-mark.svg">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: {
+              base: '#07090E',
+              surface: '#0E131F',
+              elevated: '#141A29',
+              hover: '#1A2236',
+              border: '#1E293B',
+              borderLight: '#334155'
+            },
+            cyber: {
+              iris: '#6366F1',
+              glow: 'rgba(99, 102, 241, 0.35)'
+            },
+            quantum: {
+              cyan: '#00F2FE',
+              glow: 'rgba(0, 242, 254, 0.4)'
+            },
+            status: {
+              online: '#10B981',
+              warning: '#F59E0B',
+              critical: '#EF4444'
+            },
+            platinum: '#F8FAFC'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          animation: {
+            'beacon': 'beacon 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+            'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            beacon: {
+              '0%': { transform: 'scale(1)', opacity: '0.8' },
+              '75%, 100%': { transform: 'scale(2.5)', opacity: '0' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #07090E;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1E293B;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Glassmorphism Luxury Styling */
+    .glass-panel {
+      background: rgba(14, 19, 31, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-panel:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+    .glass-card {
+      background: rgba(20, 26, 41, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      background: rgba(26, 34, 54, 0.85);
+      border-color: rgba(0, 242, 254, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px -4px rgba(0, 242, 254, 0.1);
+    }
+
+    /* Glow utilities */
+    .glow-cyan {
+      filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5));
+    }
+    .glow-iris {
+      filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+    }
+
+    /* Radial Meter Gauge */
+    .circle-meter-bg {
+      stroke: #1E293B;
+      stroke-linecap: round;
+    }
+    .circle-meter-val {
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.8s ease-in-out;
+    }
+
+    /* Brutalist grid lines */
+    .grid-bg-overlay {
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+  </style>
+</head>
+<body class="bg-obsidian-base text-slate-300 font-sans min-h-screen selection:bg-cyber-iris selection:text-white relative overflow-x-hidden">
+
+  <!-- Ambient Light Backdrops -->
+  <div class="fixed top-0 left-1/4 w-[600px] h-[350px] bg-cyber-iris/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+  <div class="fixed top-1/3 right-10 w-[500px] h-[400px] bg-quantum-cyan/5 rounded-full blur-[160px] pointer-events-none -z-10"></div>
+  <div class="fixed inset-0 grid-bg-overlay pointer-events-none -z-10 opacity-70"></div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Top Notification & Command Bar -->
+  <header class="sticky top-0 z-40 border-b border-obsidian-border bg-obsidian-base/90 backdrop-blur-md">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Host Monogram -->
+      <div class="flex items-center gap-3.5">
+        <!-- Yudiaz Concept 2B Logo Mark (Negative Space Portal) -->
+        <div class="w-9 h-9 rounded-lg bg-obsidian-surface border border-obsidian-border flex items-center justify-center p-1.5 shadow-lg group hover:border-quantum-cyan transition-colors">
+          <svg viewBox="0 0 500 500" class="w-full h-full" fill="none">
+            <!-- Left Monolith -->
+            <path d="M 118 100 L 182 100 L 236 218 Q 238 222 238 228 L 238 400 L 118 400 Z" fill="#F8FAFC" class="group-hover:fill-quantum-cyan transition-colors"/>
+            <!-- Right Monolith -->
+            <path d="M 264 400 L 264 228 Q 264 222 266 218 L 318 100 C 370 100, 412 158, 412 250 C 412 342, 370 400, 264 400 Z" fill="#F8FAFC" class="group-hover:fill-quantum-cyan transition-colors"/>
+          </svg>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-extrabold tracking-[0.16em] text-platinum font-sans">YUDIAZ SENTINEL</span>
+            <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-cyber-iris/20 text-cyber-iris border border-cyber-iris/40">v1.0-LIVE</span>
+          </div>
+          <div class="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+            <span class="text-quantum-cyan">host:</span>
+            <span class="text-slate-300">vps.daniandraaa.my.id</span>
+            <span class="text-slate-600">//</span>
+            <span class="text-slate-500">Seoul, KR</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Status Telemetry Pill -->
+      <div class="hidden md:flex items-center gap-6 px-4 py-1.5 rounded-full bg-obsidian-surface border border-obsidian-border text-xs font-mono">
+        <!-- Live Node Pulse -->
+        <div class="flex items-center gap-2">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-beacon absolute inline-flex h-full w-full rounded-full bg-status-online opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-status-online"></span>
+          </span>
+          <span class="font-bold text-emerald-400 tracking-wider">NODE ONLINE</span>
+        </div>
+
+        <div class="h-3 w-px bg-obsidian-border"></div>
+
+        <!-- Uptime Ticker -->
+        <div class="flex items-center gap-1.5">
+          <span class="text-slate-500">UPTIME</span>
+          <span id="uptimeDisplay" class="text-platinum font-semibold">14d 08h 22m 45s</span>
+        </div>
+
+        <div class="h-3 w-px bg-obsidian-border"></div>
+
+        <!-- Ping Latency -->
+        <div class="flex items-center gap-1.5">
+          <span class="text-slate-500">PING</span>
+          <span id="pingDisplay" class="text-quantum-cyan font-semibold">14ms</span>
+          <span class="text-[9px] text-emerald-400 font-bold bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">NOMINAL</span>
+        </div>
+      </div>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-2.5">
+        <!-- Refresh Button -->
+        <button id="refreshBtn" onclick="manualRefresh()" title="Sync Telemetry" class="p-2 rounded-lg bg-obsidian-surface border border-obsidian-border hover:border-slate-500 text-slate-300 hover:text-white transition-all active:scale-95">
+          <svg id="refreshIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+
+        <!-- Timezone Badge Switcher -->
+        <button onclick="toggleTimezone()" id="tzButton" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-obsidian-surface border border-obsidian-border hover:border-slate-500 text-[11px] font-mono text-slate-300">
+          <span class="text-slate-500">TZ:</span>
+          <span id="tzLabel" class="text-quantum-cyan font-bold">WIB (UTC+7)</span>
+        </button>
+
+        <!-- Direct SSH/Console Modal Trigger -->
+        <button onclick="openSystemLogsModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyber-iris/15 border border-cyber-iris/30 text-cyber-iris hover:bg-cyber-iris/25 hover:border-cyber-iris text-xs font-semibold tracking-wide transition-all">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>CLI LOGS</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- ========================================== -->
+    <!-- SECTION 1: HARDWARE TELEMETRY TRI-GAUGES   -->
+    <!-- ========================================== -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      
+      <!-- 1. vCPU 4-Core Telemetry Card -->
+      <div class="glass-panel rounded-xl p-5 border border-obsidian-border relative overflow-hidden flex flex-col justify-between">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="p-1 rounded bg-cyber-iris/20 text-cyber-iris border border-cyber-iris/30">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M3 9h2m-2 6h2m16-6h2m-2 6h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+              </span>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-platinum font-mono">vCPU Subsystem</h2>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Intel Xeon 8370C // 4 Virtual Cores</p>
+          </div>
+          <div class="text-right">
+            <span id="cpuTotalUsage" class="text-2xl font-mono font-bold text-platinum tracking-tight">24.8%</span>
+            <span class="block text-[10px] text-emerald-400 font-mono font-semibold">ALL CORES OK</span>
+          </div>
+        </div>
+
+        <!-- 60s Sparkline SVG Graph -->
+        <div class="my-2 bg-obsidian-elevated/80 rounded-lg p-2.5 border border-obsidian-border/60">
+          <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 mb-1">
+            <span>ACTIVITY SPARKLINE (60s)</span>
+            <span class="text-quantum-cyan">AVG LOAD: 0.38</span>
+          </div>
+          <svg id="cpuSparkline" viewBox="0 0 300 48" class="w-full h-12 overflow-visible">
+            <defs>
+              <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6366F1" stop-opacity="0.45"/>
+                <stop offset="100%" stop-color="#6366F1" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <path id="sparkArea" d="M0,40 L0,32 L25,30 L50,38 L75,25 L100,28 L125,18 L150,22 L175,30 L200,16 L225,24 L250,15 L275,20 L300,18 L300,48 L0,48 Z" fill="url(#sparkGrad)" />
+            <path id="sparkLine" d="M0,32 L25,30 L50,38 L75,25 L100,28 L125,18 L150,22 L175,30 L200,16 L225,24 L250,15 L275,20 L300,18" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </div>
+
+        <!-- 4 Individual Core Bars -->
+        <div class="space-y-1.5 pt-1">
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-400">Core 0 (2.80GHz)</span>
+            <div class="w-32 bg-obsidian-border rounded-full h-1.5 overflow-hidden">
+              <div id="core0Bar" class="bg-gradient-to-r from-cyber-iris to-quantum-cyan h-full rounded-full transition-all duration-500" style="width: 38%"></div>
+            </div>
+            <span id="core0Val" class="text-slate-300 w-8 text-right font-semibold">38%</span>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-400">Core 1 (2.80GHz)</span>
+            <div class="w-32 bg-obsidian-border rounded-full h-1.5 overflow-hidden">
+              <div id="core1Bar" class="bg-gradient-to-r from-cyber-iris to-quantum-cyan h-full rounded-full transition-all duration-500" style="width: 21%"></div>
+            </div>
+            <span id="core1Val" class="text-slate-300 w-8 text-right font-semibold">21%</span>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-400">Core 2 (2.80GHz)</span>
+            <div class="w-32 bg-obsidian-border rounded-full h-1.5 overflow-hidden">
+              <div id="core2Bar" class="bg-gradient-to-r from-cyber-iris to-quantum-cyan h-full rounded-full transition-all duration-500" style="width: 29%"></div>
+            </div>
+            <span id="core2Val" class="text-slate-300 w-8 text-right font-semibold">29%</span>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-400">Core 3 (2.80GHz)</span>
+            <div class="w-32 bg-obsidian-border rounded-full h-1.5 overflow-hidden">
+              <div id="core3Bar" class="bg-gradient-to-r from-cyber-iris to-quantum-cyan h-full rounded-full transition-all duration-500" style="width: 12%"></div>
+            </div>
+            <span id="core3Val" class="text-slate-300 w-8 text-right font-semibold">12%</span>
+          </div>
+        </div>
+
+        <!-- Load Averages Badges -->
+        <div class="mt-3 pt-2.5 border-t border-obsidian-border/70 flex items-center justify-between text-[10px] font-mono">
+          <span class="text-slate-500">LOAD AVG</span>
+          <div class="flex gap-2">
+            <span class="px-1.5 py-0.5 rounded bg-obsidian-elevated border border-obsidian-border text-slate-300"><span class="text-slate-500">1m:</span> 0.42</span>
+            <span class="px-1.5 py-0.5 rounded bg-obsidian-elevated border border-obsidian-border text-slate-300"><span class="text-slate-500">5m:</span> 0.38</span>
+            <span class="px-1.5 py-0.5 rounded bg-obsidian-elevated border border-obsidian-border text-slate-300"><span class="text-slate-500">15m:</span> 0.31</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Memory RAM 54GB Telemetry Card -->
+      <div class="glass-panel rounded-xl p-5 border border-obsidian-border relative overflow-hidden flex flex-col justify-between">
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="p-1 rounded bg-quantum-cyan/20 text-quantum-cyan border border-quantum-cyan/30">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </span>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-platinum font-mono">Memory Subsystem</h2>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-0.5">High Density DDR4 ECC</p>
+          </div>
+          <div class="text-right">
+            <span id="ramPercentText" class="text-2xl font-mono font-bold text-quantum-cyan tracking-tight">34.1%</span>
+            <span class="block text-[10px] text-slate-400 font-mono">18.4 / 54.0 GiB</span>
+          </div>
+        </div>
+
+        <!-- Radial Gauge & Split Breakdown -->
+        <div class="flex items-center justify-around py-3">
+          <!-- Circular SVG Gauge -->
+          <div class="relative w-28 h-28 flex items-center justify-center">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" class="circle-meter-bg fill-none" stroke-width="8"></circle>
+              <!-- 251.2 is circumference (2 * PI * 40). 34% = dashoffset 165 -->
+              <circle id="ramRadialCircle" cx="50" cy="50" r="40" fill="none" stroke="url(#ramGrad)" stroke-width="8" class="circle-meter-val" stroke-dasharray="251.2" stroke-dashoffset="165"></circle>
+              <defs>
+                <linearGradient id="ramGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#00F2FE" />
+                  <stop offset="100%" stop-color="#6366F1" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span class="text-xs font-mono font-bold text-platinum">54 GiB</span>
+              <span class="text-[9px] font-mono text-slate-400 uppercase tracking-wider">TOTAL</span>
+            </div>
+          </div>
+
+          <!-- Linear Detailed Distribution -->
+          <div class="space-y-2 text-xs font-mono w-44">
+            <div class="flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-cyber-iris"></span>
+                <span>Active:</span>
+              </span>
+              <span id="ramActiveVal" class="text-platinum font-semibold">18.4 GiB</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-quantum-cyan"></span>
+                <span>Buffers/Cache:</span>
+              </span>
+              <span id="ramCachedVal" class="text-slate-300 font-semibold">12.1 GiB</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-slate-400">
+                <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+                <span>Available Free:</span>
+              </span>
+              <span id="ramFreeVal" class="text-slate-400">23.5 GiB</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stacked Linear Bar -->
+        <div class="w-full bg-obsidian-border rounded-full h-2 overflow-hidden flex mb-2">
+          <div style="width: 34%" class="bg-cyber-iris h-full" title="Active: 18.4 GB"></div>
+          <div style="width: 22%" class="bg-quantum-cyan h-full" title="Cached: 12.1 GB"></div>
+          <div style="width: 44%" class="bg-slate-700/60 h-full" title="Free: 23.5 GB"></div>
+        </div>
+
+        <!-- Swap Bar -->
+        <div class="pt-2 border-t border-obsidian-border/70 flex items-center justify-between text-[10px] font-mono">
+          <span class="text-slate-500">SWAP MEMORY</span>
+          <div class="flex items-center gap-2">
+            <div class="w-20 bg-obsidian-border rounded-full h-1 overflow-hidden">
+              <div class="bg-emerald-400 h-full" style="width: 2%"></div>
+            </div>
+            <span class="text-emerald-400 font-bold">0 MB / 4.0 GiB (OPTIMAL)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. NVMe Storage & I/O Telemetry Card -->
+      <div class="glass-panel rounded-xl p-5 border border-obsidian-border relative overflow-hidden flex flex-col justify-between">
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="p-1 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7C5 4 4 5 4 7zM9 12h6m-6 4h4" />
+                </svg>
+              </span>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-platinum font-mono">NVMe Storage Array</h2>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Azure Ultra NVMe Gen4</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-mono font-bold">HEALTHY</span>
+            <span class="block text-[10px] text-slate-400 font-mono mt-0.5">S.M.A.R.T VERIFIED</span>
+          </div>
+        </div>
+
+        <!-- Partition Split Bars -->
+        <div class="space-y-3 py-1">
+          <!-- Root / Partition -->
+          <div>
+            <div class="flex justify-between items-center text-xs font-mono mb-1">
+              <span class="text-slate-300 font-semibold">OS Root (/)</span>
+              <span class="text-slate-400"><strong class="text-platinum">19.5 GB</strong> / 61.0 GB <span class="text-quantum-cyan">(32%)</span></span>
+            </div>
+            <div class="w-full bg-obsidian-border rounded-full h-2 overflow-hidden">
+              <div class="bg-gradient-to-r from-cyber-iris to-purple-500 h-full rounded-full" style="width: 32%"></div>
+            </div>
+          </div>
+
+          <!-- Ephemeral /mnt Partition -->
+          <div>
+            <div class="flex justify-between items-center text-xs font-mono mb-1">
+              <span class="text-slate-300 font-semibold">Ephemeral Fast Storage (/mnt)</span>
+              <span class="text-slate-400"><strong class="text-platinum">15.4 GB</strong> / 110.0 GB <span class="text-amber-400">(14%)</span></span>
+            </div>
+            <div class="w-full bg-obsidian-border rounded-full h-2 overflow-hidden">
+              <div class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full" style="width: 14%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time I/O Telemetry Stats -->
+        <div class="grid grid-cols-3 gap-2 bg-obsidian-elevated/70 p-2 rounded-lg border border-obsidian-border text-center font-mono my-1">
+          <div>
+            <span class="text-[9px] text-slate-500 block uppercase">READ SPEED</span>
+            <span id="diskReadVal" class="text-xs font-bold text-quantum-cyan">4.2 MB/s</span>
+          </div>
+          <div>
+            <span class="text-[9px] text-slate-500 block uppercase">WRITE SPEED</span>
+            <span id="diskWriteVal" class="text-xs font-bold text-cyber-iris">1.8 MB/s</span>
+          </div>
+          <div>
+            <span class="text-[9px] text-slate-500 block uppercase">TOTAL IOPS</span>
+            <span id="diskIopsVal" class="text-xs font-bold text-platinum">420 req/s</span>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-obsidian-border/70 flex items-center justify-between text-[10px] font-mono">
+          <span class="text-slate-500">FILE SYSTEM</span>
+          <span class="text-slate-400 font-semibold">ext4 (rw,noatime,discard)</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: DUAL-COLUMN MAIN ARCHITECTURE   -->
+    <!-- ========================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT COLUMN: SYSTEM SPECIFICATIONS & ACTIVE PROJECTS (5 COLS) -->
+      <div class="lg:col-span-5 space-y-6">
+
+        <!-- 1. System Specifications Monolith Card -->
+        <div class="glass-panel rounded-xl p-5 border border-obsidian-border">
+          <div class="flex items-center justify-between pb-3 border-b border-obsidian-border mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-sm bg-quantum-cyan shadow-[0_0_8px_#00F2FE]"></div>
+              <h3 class="text-xs font-bold tracking-wider uppercase text-platinum font-mono">System Architecture</h3>
+            </div>
+            <span class="text-[10px] font-mono text-slate-400 bg-obsidian-elevated px-2 py-0.5 rounded border border-obsidian-border">CLOUD VM HOST</span>
+          </div>
+
+          <!-- Specs Definition Grid -->
+          <div class="space-y-3 text-xs font-mono">
+            <!-- CPU -->
+            <div class="flex items-start justify-between py-1.5 border-b border-obsidian-border/50">
+              <span class="text-slate-400 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Processor:
+              </span>
+              <span class="text-platinum text-right font-medium">Intel Xeon Platinum 8370C<br><span class="text-slate-400 text-[11px]">@ 2.80GHz (4 vCPU)</span></span>
+            </div>
+
+            <!-- RAM -->
+            <div class="flex items-center justify-between py-1.5 border-b border-obsidian-border/50">
+              <span class="text-slate-400 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M3 9h2m-2 6h2m16-6h2m-2 6h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Installed RAM:
+              </span>
+              <span class="text-platinum font-semibold">54.0 GiB DDR4 ECC</span>
+            </div>
+
+            <!-- Datacenter -->
+            <div class="flex items-center justify-between py-1.5 border-b border-obsidian-border/50">
+              <span class="text-slate-400 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                Cloud Region:
+              </span>
+              <span class="text-quantum-cyan font-medium">Azure Seoul (Korea Central)</span>
+            </div>
+
+            <!-- OS & Kernel -->
+            <div class="flex items-center justify-between py-1.5 border-b border-obsidian-border/50">
+              <span class="text-slate-400 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                OS / Kernel:
+              </span>
+              <span class="text-platinum text-right">Ubuntu 24.04 LTS<br><span class="text-slate-500 text-[10px]">Kernel 6.17.0-1022-azure</span></span>
+            </div>
+
+            <!-- Public IP with Copy -->
+            <div class="flex items-center justify-between pt-2">
+              <span class="text-slate-400 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                Public IP:
+              </span>
+              <div class="flex items-center gap-1.5 bg-obsidian-elevated px-2.5 py-1 rounded border border-obsidian-border hover:border-quantum-cyan transition-colors">
+                <code id="publicIpText" class="text-quantum-cyan font-bold">20.200.220.190</code>
+                <button onclick="copyToClipboard('20.200.220.190', 'Public IP Copied!')" class="text-slate-400 hover:text-white transition-colors" title="Copy IP">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Active Projects & Daemons Showcase -->
+        <div class="glass-panel rounded-xl p-5 border border-obsidian-border">
+          <div class="flex items-center justify-between pb-3 border-b border-obsidian-border mb-4">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-sm bg-cyber-iris shadow-[0_0_8px_#6366F1]"></span>
+              <h3 class="text-xs font-bold tracking-wider uppercase text-platinum font-mono">Active Project Daemons</h3>
+            </div>
+            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">4 RUNNING</span>
+          </div>
+
+          <!-- Services List -->
+          <div class="space-y-2.5">
+            
+            <!-- Service 1: Hermes Agent Platform -->
+            <div class="glass-card rounded-lg p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-cyber-iris/15 border border-cyber-iris/30 flex items-center justify-center text-cyber-iris font-mono text-xs font-bold">
+                  H9
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="text-xs font-bold text-platinum font-mono">Hermes Agent Platform</h4>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">PORT 9119</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400">Core Multi-Agent Orchestration Engine</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-[10px] font-mono font-bold text-emerald-400">ONLINE</span>
+              </div>
+            </div>
+
+            <!-- Service 2: 9Router AI Gateway -->
+            <div class="glass-card rounded-lg p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-quantum-cyan/15 border border-quantum-cyan/30 flex items-center justify-center text-quantum-cyan font-mono text-xs font-bold">
+                  9R
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="text-xs font-bold text-platinum font-mono">9Router AI Gateway</h4>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">PORT 20128</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400">LLM Inference Proxy & Failover Router</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-[10px] font-mono font-bold text-emerald-400">ONLINE</span>
+              </div>
+            </div>
+
+            <!-- Service 3: Caddy TLS Reverse Proxy -->
+            <div class="glass-card rounded-lg p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono text-xs font-bold">
+                  CD
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="text-xs font-bold text-platinum font-mono">Caddy TLS Reverse Proxy</h4>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">80 / 443</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400">Automated ACME TLS & SSL Termination</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-[10px] font-mono font-bold text-emerald-400">ACTIVE</span>
+              </div>
+            </div>
+
+            <!-- Service 4: Yudiaz Creative Studio Assets -->
+            <div class="glass-card rounded-lg p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 font-mono text-xs font-bold">
+                  YD
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="text-xs font-bold text-platinum font-mono">Yudiaz Studio Core Assets</h4>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">LOCAL / CDN</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400">Brand Vector Vault & Master Tokens</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="inline-flex rounded-full h-2 w-2 bg-purple-400"></span>
+                <span class="text-[10px] font-mono font-bold text-purple-400">SYNCED</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: YUDIAZ AI AGENT TEAM HUB (7 COLS) -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- Agent Roster Hub Card -->
+        <div class="glass-panel rounded-xl p-5 border border-obsidian-border">
+          
+          <!-- Header & Department Filters -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-obsidian-border mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-sm bg-purple-400 shadow-[0_0_8px_#C084FC]"></div>
+                <h3 class="text-xs font-bold tracking-wider uppercase text-platinum font-mono">Yudiaz AI Agent Hub</h3>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5">9 Autonomous Agents Orchestrated on VPS</p>
+            </div>
+
+            <!-- Department Filter Tabs -->
+            <div class="flex items-center gap-1 bg-obsidian-elevated p-1 rounded-lg border border-obsidian-border text-[11px] font-mono">
+              <button onclick="filterAgents('all')" id="filterAll" class="px-2.5 py-1 rounded bg-cyber-iris text-white font-semibold transition-all">All (9)</button>
+              <button onclick="filterAgents('dev')" id="filterDev" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-all">Core Dev (7)</button>
+              <button onclick="filterAgents('support')" id="filterSupport" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-all">Ops & Intel (2)</button>
+            </div>
+          </div>
+
+          <!-- Agent Roster Grid -->
+          <div id="agentRosterGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+
+            <!-- 1. Raziel Hendrix -->
+            <div class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('raziel')">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-cyber-iris/20 border border-cyber-iris flex items-center justify-center text-cyber-iris font-mono font-bold text-sm shadow-[0_0_12px_rgba(99,102,241,0.3)]">
+                  RH
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Raziel Hendrix</h4>
+                <p class="text-[11px] text-cyber-iris font-mono font-medium">CTO & Orchestrator</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Decomposing CEO brief, assigning subagents, orchestrating architecture.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-slate-400">HERMES: ACTIVE</span>
+              </div>
+            </div>
+
+            <!-- 2. Kael Ashford -->
+            <div class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('kael')">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-quantum-cyan/20 border border-quantum-cyan flex items-center justify-center text-quantum-cyan font-mono font-bold text-sm shadow-[0_0_12px_rgba(0,242,254,0.3)]">
+                  KA
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Kael Ashford</h4>
+                <p class="text-[11px] text-quantum-cyan font-mono font-medium">Lead System Architect</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Designing system topology, DB schemas, and high-concurrency contracts.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-slate-400">ARCH: SPECS OK</span>
+              </div>
+            </div>
+
+            <!-- 3. Nara Vasquez -->
+            <div class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('nara')">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-sky-500/20 border border-sky-400 flex items-center justify-center text-sky-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(56,189,248,0.3)]">
+                  NV
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Nara Vasquez</h4>
+                <p class="text-[11px] text-sky-400 font-mono font-medium">Lead Tech Researcher</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Benchmarking AI models, paper discovery, and architectural feasibility.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-slate-400">RESEARCH: LIVE</span>
+              </div>
+            </div>
+
+            <!-- 4. Senna Louviere -->
+            <div class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('senna')">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-rose-500/20 border border-rose-400 flex items-center justify-center text-rose-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(244,63,94,0.3)]">
+                  SL
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span> ACTIVE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Senna Louviere</h4>
+                <p class="text-[11px] text-rose-400 font-mono font-medium">Creative Director</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Curating Dark Luxury Brutalism, design system tokens, and UI mockups.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-rose-400">DESIGNING UI</span>
+              </div>
+            </div>
+
+            <!-- 5. Idris Nakamura -->
+            <div class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('idris')">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                  IN
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Idris Nakamura</h4>
+                <p class="text-[11px] text-emerald-400 font-mono font-medium">Senior Dev & DevOps</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Server automation, backend telemetry endpoints, and system logic.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-slate-400">BACKEND: READY</span>
+              </div>
+            </div>
+
+            <!-- 6. Mika Stellan -->
+            <div class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('mika')">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-violet-500/20 border border-violet-400 flex items-center justify-center text-violet-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(168,85,247,0.3)]">
+                  MS
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> BUSY
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Mika Stellan</h4>
+                <p class="text-[11px] text-violet-400 font-mono font-medium">Frontend Engineer</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Implementing React components, responsive layouts, and Tailwind tokens.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-amber-400">BUILDING CODE</span>
+              </div>
+            </div>
+
+            <!-- 7. Viktor Moreau -->
+            <div class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('viktor')">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-400 flex items-center justify-center text-amber-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                  VM
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-slate-400 bg-slate-500/10 px-1.5 py-0.5 rounded border border-slate-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> STANDBY
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Viktor Moreau</h4>
+                <p class="text-[11px] text-amber-400 font-mono font-medium">Lead QA & Security</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Penetration tests, security audit, and quality sign-off checks.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-slate-400">AUDIT: 0 FAILS</span>
+              </div>
+            </div>
+
+            <!-- 8. Elara Sinclair -->
+            <div class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="support" onclick="inspectAgent('elara')">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-pink-500/20 border border-pink-400 flex items-center justify-center text-pink-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(236,72,153,0.3)]">
+                  ES
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Elara Sinclair</h4>
+                <p class="text-[11px] text-pink-400 font-mono font-medium">PA to CEO & Ops</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  CEO agenda dispatch, meal notifications, LinkedIn/IG surveillance.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>EXEC SUPPORT</span>
+                <span class="text-emerald-400">BRIEF READY</span>
+              </div>
+            </div>
+
+            <!-- 9. Jovan Aritza -->
+            <div class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="support" onclick="inspectAgent('jovan')">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(6,182,212,0.3)]">
+                  JA
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span> WATCHING
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Jovan Aritza</h4>
+                <p class="text-[11px] text-cyan-400 font-mono font-medium">Intelligence Officer</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Telkom University surveillance, events scrape, academic bulletin alerts.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>INTEL & FIELD</span>
+                <span class="text-sky-400">TEL-U MONITOR</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Hub Footer Telemetry Dispatch Status -->
+          <div class="mt-4 pt-3 border-t border-obsidian-border flex items-center justify-between text-xs font-mono text-slate-400">
+            <span class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>All 9 Agent Processes Bound to Port 9119 Subagent Bridge</span>
+            </span>
+            <span class="text-slate-500 text-[11px]">Orchestrated by Raziel Hendrix</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FOOTER: LUXURY BRUTALIST SIGN-OFF          -->
+    <!-- ========================================== -->
+    <footer class="mt-12 py-6 border-t border-obsidian-border/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
+      <div class="flex items-center gap-3">
+        <!-- Negative space monogram mini -->
+        <div class="w-5 h-5">
+          <svg viewBox="0 0 500 500" class="w-full h-full fill-slate-500">
+            <path d="M 118 100 L 182 100 L 236 218 Q 238 222 238 228 L 238 400 L 118 400 Z" />
+            <path d="M 264 400 L 264 228 Q 264 222 266 218 L 318 100 C 370 100, 412 158, 412 250 C 412 342, 370 400, 264 400 Z" />
+          </svg>
+        </div>
+        <span>YUDIAZ CREATIVE STUDIO &copy; 2026 // ALL RIGHTS RESERVED</span>
+      </div>
+
+      <div class="flex items-center gap-4 text-[11px]">
+        <span>CEO: <strong class="text-slate-300">Daniandra Prayudisty</strong></span>
+        <span class="text-obsidian-borderLight">|</span>
+        <span>CTO: <strong class="text-slate-300">Raziel Hendrix</strong></span>
+        <span class="text-obsidian-borderLight">|</span>
+        <span>DESIGN: <strong class="text-quantum-cyan">Senna Louviere</strong></span>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL 1: AGENT INSPECTOR DRAWER            -->
+  <!-- ========================================== -->
+  <div id="agentModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-lg rounded-2xl p-6 border border-cyber-iris/40 shadow-2xl relative">
+      <button onclick="closeAgentModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-obsidian-elevated border border-obsidian-border">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+
+      <div class="flex items-center gap-4 pb-4 border-b border-obsidian-border">
+        <div id="modalAgentBadge" class="w-14 h-14 rounded-xl bg-cyber-iris/20 border border-cyber-iris flex items-center justify-center text-cyber-iris font-mono font-bold text-xl shadow-[0_0_15px_rgba(99,102,241,0.3)]">
+          --
+        </div>
+        <div>
+          <h3 id="modalAgentName" class="text-lg font-bold text-platinum font-sans">Agent Name</h3>
+          <p id="modalAgentRole" class="text-xs text-quantum-cyan font-mono font-semibold">Agent Role</p>
+          <span id="modalAgentStatus" class="inline-block mt-1 text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">ONLINE</span>
+        </div>
+      </div>
+
+      <div class="space-y-4 py-4 text-xs font-mono">
+        <div>
+          <span class="text-slate-400 block uppercase text-[10px]">Soul & Specialization:</span>
+          <p id="modalAgentSoul" class="text-slate-200 mt-1 leading-relaxed bg-obsidian-elevated p-3 rounded-lg border border-obsidian-border">Description text here</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-obsidian-elevated p-2.5 rounded-lg border border-obsidian-border">
+            <span class="text-slate-400 text-[10px] block">DEPARTMENT:</span>
+            <span id="modalAgentDept" class="text-platinum font-bold">Engineering</span>
+          </div>
+          <div class="bg-obsidian-elevated p-2.5 rounded-lg border border-obsidian-border">
+            <span class="text-slate-400 text-[10px] block">RUNTIME BRIDGE:</span>
+            <span class="text-quantum-cyan font-bold">Hermes Subagent #4</span>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-slate-400 block uppercase text-[10px]">Agent Motto:</span>
+          <p id="modalAgentQuote" class="text-slate-400 italic mt-1 border-l-2 border-cyber-iris pl-3 py-1">"Quote here"</p>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-obsidian-border flex justify-end">
+        <button onclick="closeAgentModal()" class="px-4 py-2 rounded-lg bg-cyber-iris text-white text-xs font-semibold hover:bg-cyber-iris/90 transition-colors">Close Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL 2: SYSTEM LOGS & TELEMETRY STREAM   -->
+  <!-- ========================================== -->
+  <div id="logsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 border border-obsidian-border shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-obsidian-border">
+        <div class="flex items-center gap-2">
+          <span class="p-1 rounded bg-cyber-iris/20 text-cyber-iris">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </span>
+          <h3 class="text-sm font-bold text-platinum font-mono">Live Kernel & Daemon Streams</h3>
+        </div>
+        <button onclick="closeSystemLogsModal()" class="text-slate-400 hover:text-white p-1 rounded-lg bg-obsidian-elevated border border-obsidian-border">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="my-4 p-3 bg-obsidian-base rounded-lg border border-obsidian-border font-mono text-[11px] text-slate-300 h-64 overflow-y-auto space-y-1" id="terminalLogs">
+        <div class="text-emerald-400">[SYSTEM] Kernel 6.17.0-1022-azure initialized. 4 Cores active.</div>
+        <div class="text-slate-400">[CADDY] ACME TLS certificates verified for vps.daniandraaa.my.id</div>
+        <div class="text-cyber-iris">[9ROUTER] Port 20128 upstream connected to OpenAI/Anthropic gateway.</div>
+        <div class="text-quantum-cyan">[HERMES] Port 9119 listening for subagent RPC commands. Session active: raziel-cto.</div>
+        <div class="text-slate-500">[AUTH] SSH accepted publickey for daniilham from 20.200.220.190</div>
+        <div class="text-amber-400">[STORAGE] S.M.A.R.T NVMe check completed. Wear index: 0.01%. 0 bad sectors.</div>
+        <div class="text-emerald-400">[AGENT] Raziel Hendrix heartbeat received: 100% health.</div>
+        <div class="text-emerald-400">[AGENT] Senna Louviere uploaded DESIGN_SPEC.md & mockup.html.</div>
+      </div>
+
+      <div class="flex justify-between items-center pt-3 border-t border-obsidian-border text-xs font-mono text-slate-400">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Listening to syslog /var/log/syslog</span>
+        </span>
+        <button onclick="clearLogs()" class="px-3 py-1 rounded bg-obsidian-elevated hover:bg-obsidian-hover border border-obsidian-border text-slate-300">Clear Buffer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Client Simulation & Interactivity -->
+  <script>
+    // Agent Profiles Database
+    const agentDatabase = {
+      raziel: {
+        name: "Raziel Hendrix",
+        role: "CTO & Orchestrator",
+        dept: "Engineering & Orchestration",
+        badge: "RH",
+        color: "text-cyber-iris",
+        border: "border-cyber-iris",
+        status: "ONLINE // ORCHESTRATING",
+        soul: "Tegas, strategis, perfeksionis. Menerima brief dari CEO Daniandra Prayudisty, memecah masalah kompleks menjadi task terukur, mendelegasikan ke seluruh tim spesialis Yudiaz, dan melakukan final review sebelum deploy.",
+        quote: "Strategi tanpa eksekusi adalah halusinasi. Eksekusi tanpa strategi adalah kekacauan."
+      },
+      kael: {
+        name: "Kael Ashford",
+        role: "Lead System Architect",
+        dept: "System Architecture",
+        badge: "KA",
+        color: "text-quantum-cyan",
+        border: "border-quantum-cyan",
+        status: "ONLINE // ACTIVE",
+        soul: "Merancang arsitektur sistem, skema database tingkat tinggi, kontrak antarmuka API, dan struktur microservices untuk memastikan ketahanan beban server VPS.",
+        quote: "Arsitektur yang baik tidak terlihat sampai saat sistem diuji dengan jutaan request."
+      },
+      nara: {
+        name: "Nara Vasquez",
+        role: "Lead Tech Researcher",
+        dept: "Research & Benchmarking",
+        badge: "NV",
+        color: "text-sky-400",
+        border: "border-sky-400",
+        status: "ONLINE // RESEARCHING",
+        soul: "Melakukan riset teknologi terdepan, benchmarking model AI, eksplorasi paper arXiv, dan memberikan analisis kelayakan sebelum tim teknis membangun sistem.",
+        quote: "Kebenaran data adalah fondasi setiap inovasi cerdas."
+      },
+      senna: {
+        name: "Senna Louviere",
+        role: "Creative Director",
+        dept: "Creative & UI/UX",
+        badge: "SL",
+        color: "text-rose-400",
+        border: "border-rose-400",
+        status: "ACTIVE // DESIGNING",
+        soul: "Artistik, user-centric, modern brutalist-minimalist. Memastikan setiap komponen visual, design token, dan mockup memiliki estetika dark luxury premium dan berstandar WCAG 2.1 AA.",
+        quote: "Desain bukan soal cantik, tapi soal experience."
+      },
+      idris: {
+        name: "Idris Nakamura",
+        role: "Senior Developer & DevOps",
+        dept: "Backend & Infrastructure",
+        badge: "IN",
+        color: "text-emerald-400",
+        border: "border-emerald-400",
+        status: "ONLINE // EXECUTING",
+        soul: "Membangun endpoint API, mengelola runtime daemon, containerization, dan memastikan pipeline cloud Azure di VPS berjalan dengan efisiensi tinggi.",
+        quote: "Kode yang bersih adalah kode yang bisa dipahami dan dideploy tanpa rasa takut."
+      },
+      mika: {
+        name: "Mika Stellan",
+        role: "Frontend Engineer",
+        dept: "Frontend Engineering",
+        badge: "MS",
+        color: "text-violet-400",
+        border: "border-violet-400",
+        status: "BUSY // CODING",
+        soul: "Mengonversi spec desain dari Senna menjadi kode React, Next.js, dan Tailwind CSS interaktif, responsive, dan hemat daya render.",
+        quote: "Setiap frame dan animasi harus terasa instan bagi pengguna."
+      },
+      viktor: {
+        name: "Viktor Moreau",
+        role: "Lead QA & Security",
+        dept: "QA & Security Audit",
+        badge: "VM",
+        color: "text-amber-400",
+        border: "border-amber-400",
+        status: "STANDBY // AUDITING",
+        soul: "Melakukan audit keamanan, penetrasi vulnerability, verifikasi unit testing, dan pengujian keandalan sebelum sistem diluncurkan ke domain publik.",
+        quote: "Tidak ada sistem yang aman jika kita tidak mengujinya seperti seorang penyerang."
+      },
+      elara: {
+        name: "Elara Sinclair",
+        role: "PA to CEO & Operations",
+        dept: "Executive Support",
+        badge: "ES",
+        color: "text-pink-400",
+        border: "border-pink-400",
+        status: "ONLINE // MONITORING",
+        soul: "Asisten pribadi CEO Daniandra Prayudisty Ilham. Mengatur agenda harian, reminder makan dan nutrisi, monitoring sosial media LinkedIn dan Instagram.",
+        quote: "Jadwal Anda sudah saya atur, makan siang jangan lupa."
+      },
+      jovan: {
+        name: "Jovan Aritza",
+        role: "Intelligence Officer",
+        dept: "Intelligence & Field Surveillance",
+        badge: "JA",
+        color: "text-cyan-400",
+        border: "border-cyan-400",
+        status: "WATCHING // ACTIVE",
+        soul: "Memantau seluruh aktivitas, pengumuman resmi, media sosial, dan tren seputar Telkom University untuk dilaporkan langsung ke CEO Daniandra.",
+        quote: "Kalau ada info penting soal Tel-U, saya yang pertama tahu."
+      }
+    };
+
+    // Live Uptime Counter Logic
+    let uptimeSeconds = 14 * 86400 + 8 * 3600 + 22 * 60 + 45;
+    function updateUptimeTicker() {
+      uptimeSeconds++;
+      const days = Math.floor(uptimeSeconds / 86400);
+      const hours = Math.floor((uptimeSeconds % 86400) / 3600);
+      const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+      const seconds = uptimeSeconds % 60;
+      
+      const pad = (n) => String(n).padStart(2, '0');
+      document.getElementById('uptimeDisplay').innerText = 
+        `${days}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+    }
+    setInterval(updateUptimeTicker, 1000);
+
+    // Dynamic Live Telemetry Engine (Dual-mode: Real SSE Stream or Offline Simulation)
+    let sseActive = false;
+    function initLiveTelemetryStream() {
+      if (window.location.protocol.startsWith('http')) {
+        try {
+          const evtSource = new EventSource('/api/v1/metrics/stream');
+          evtSource.onopen = () => {
+            sseActive = true;
+            console.log('[Sentinel] Connected to live SSE stream');
+          };
+          evtSource.onmessage = (e) => {
+            try {
+              const data = JSON.parse(e.data);
+              applyLiveTelemetry(data);
+            } catch (err) {
+              console.error('SSE parse error:', err);
+            }
+          };
+          evtSource.onerror = () => {
+            sseActive = false;
+          };
+        } catch (e) {
+          sseActive = false;
+        }
+      }
+    }
+
+    function applyLiveTelemetry(data) {
+      if (data.cpu) {
+        document.getElementById('cpuTotalUsage').innerText = `${data.cpu.totalPercent.toFixed(1)}%`;
+        if (data.cpu.cores && data.cpu.cores.length >= 4) {
+          for (let i = 0; i < 4; i++) {
+            const val = Math.round(data.cpu.cores[i]);
+            document.getElementById(`core${i}Bar`).style.width = `${val}%`;
+            document.getElementById(`core${i}Val`).innerText = `${val}%`;
+          }
+        }
+      }
+      if (data.ram) {
+        const percent = ((data.ram.usedBytes / data.ram.totalBytes) * 100).toFixed(1);
+        document.getElementById('ramPercentText').innerText = `${percent}%`;
+        const offset = 251.2 - (251.2 * (percent / 100));
+        document.getElementById('ramRadialCircle').style.strokeDashoffset = offset;
+        const usedGiB = (data.ram.usedBytes / (1024**3)).toFixed(1);
+        const cachedGiB = (data.ram.cachedBytes / (1024**3)).toFixed(1);
+        const freeGiB = (data.ram.freeBytes / (1024**3)).toFixed(1);
+        document.getElementById('ramActiveVal').innerText = `${usedGiB} GiB`;
+        document.getElementById('ramCachedVal').innerText = `${cachedGiB} GiB`;
+        document.getElementById('ramFreeVal').innerText = `${freeGiB} GiB`;
+      }
+      if (data.disk && data.disk.io) {
+        document.getElementById('diskReadVal').innerText = `${data.disk.io.readSpeed || '4.2 MB/s'}`;
+        document.getElementById('diskWriteVal').innerText = `${data.disk.io.writeSpeed || '1.8 MB/s'}`;
+        document.getElementById('diskIopsVal').innerText = `${data.disk.io.iops || '420 req/s'}`;
+      }
+      if (data.uptimeSeconds) {
+        uptimeSeconds = data.uptimeSeconds;
+      }
+    }
+
+    // Live Telemetry Fluctuation Simulator (Active when not streaming live SSE)
+    function simulateTelemetry() {
+      if (sseActive) return; // Do not overwrite live backend data
+      // CPU Jitter
+      const baseCpu = 24.8;
+      const jitter = (Math.random() * 4 - 2).toFixed(1);
+      const currentCpu = Math.max(15, Math.min(45, (parseFloat(baseCpu) + parseFloat(jitter)).toFixed(1)));
+      document.getElementById('cpuTotalUsage').innerText = `${currentCpu}%`;
+
+      // Core fluctuations
+      const c0 = Math.floor(30 + Math.random() * 15);
+      const c1 = Math.floor(18 + Math.random() * 10);
+      const c2 = Math.floor(22 + Math.random() * 14);
+      const c3 = Math.floor(10 + Math.random() * 8);
+
+      document.getElementById('core0Bar').style.width = `${c0}%`;
+      document.getElementById('core0Val').innerText = `${c0}%`;
+      document.getElementById('core1Bar').style.width = `${c1}%`;
+      document.getElementById('core1Val').innerText = `${c1}%`;
+      document.getElementById('core2Bar').style.width = `${c2}%`;
+      document.getElementById('core2Val').innerText = `${c2}%`;
+      document.getElementById('core3Bar').style.width = `${c3}%`;
+      document.getElementById('core3Val').innerText = `${c3}%`;
+
+      // Ping latency jitter
+      const ping = Math.floor(13 + Math.random() * 4);
+      document.getElementById('pingDisplay').innerText = `${ping}ms`;
+
+      // Disk IO jitter
+      const rSpeed = (3.8 + Math.random() * 1.2).toFixed(1);
+      const wSpeed = (1.4 + Math.random() * 0.9).toFixed(1);
+      const iops = Math.floor(400 + Math.random() * 60);
+      document.getElementById('diskReadVal').innerText = `${rSpeed} MB/s`;
+      document.getElementById('diskWriteVal').innerText = `${wSpeed} MB/s`;
+      document.getElementById('diskIopsVal').innerText = `${iops} req/s`;
+    }
+    setInterval(simulateTelemetry, 3000);
+    window.addEventListener('DOMContentLoaded', initLiveTelemetryStream);
+
+    // Filter Agent Roster
+    function filterAgents(type) {
+      const cards = document.querySelectorAll('.agent-card');
+      const btnAll = document.getElementById('filterAll');
+      const btnDev = document.getElementById('filterDev');
+      const btnSup = document.getElementById('filterSupport');
+
+      // Reset button styles
+      [btnAll, btnDev, btnSup].forEach(btn => {
+        btn.className = "px-2.5 py-1 rounded text-slate-400 hover:text-white transition-all";
+      });
+
+      if (type === 'all') {
+        btnAll.className = "px-2.5 py-1 rounded bg-cyber-iris text-white font-semibold transition-all";
+        cards.forEach(card => card.classList.remove('hidden'));
+      } else if (type === 'dev') {
+        btnDev.className = "px-2.5 py-1 rounded bg-cyber-iris text-white font-semibold transition-all";
+        cards.forEach(card => {
+          if (card.dataset.dept === 'dev') {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      } else if (type === 'support') {
+        btnSup.className = "px-2.5 py-1 rounded bg-cyber-iris text-white font-semibold transition-all";
+        cards.forEach(card => {
+          if (card.dataset.dept === 'support') {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      }
+    }
+
+    // Agent Modal Inspection
+    function inspectAgent(id) {
+      const agent = agentDatabase[id];
+      if (!agent) return;
+
+      document.getElementById('modalAgentName').innerText = agent.name;
+      document.getElementById('modalAgentRole').innerText = agent.role;
+      document.getElementById('modalAgentStatus').innerText = agent.status;
+      document.getElementById('modalAgentSoul').innerText = agent.soul;
+      document.getElementById('modalAgentDept').innerText = agent.dept;
+      document.getElementById('modalAgentQuote').innerText = `"${agent.quote}"`;
+
+      const badgeElem = document.getElementById('modalAgentBadge');
+      badgeElem.innerText = agent.badge;
+      badgeElem.className = `w-14 h-14 rounded-xl bg-obsidian-surface border ${agent.border} flex items-center justify-center ${agent.color} font-mono font-bold text-xl shadow-lg`;
+
+      const modal = document.getElementById('agentModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeAgentModal() {
+      const modal = document.getElementById('agentModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // System Logs Modal
+    function openSystemLogsModal() {
+      const modal = document.getElementById('logsModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeSystemLogsModal() {
+      const modal = document.getElementById('logsModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function clearLogs() {
+      document.getElementById('terminalLogs').innerHTML = '<div class="text-slate-500">[BUFFER CLEARED] Listening for new events...</div>';
+    }
+
+    // Timezone Switcher
+    const timezones = [
+      { label: "WIB (UTC+7)", code: "Asia/Jakarta" },
+      { label: "KST (UTC+9)", code: "Asia/Seoul" },
+      { label: "UTC (GMT)", code: "UTC" }
+    ];
+    let currentTzIdx = 0;
+    function toggleTimezone() {
+      currentTzIdx = (currentTzIdx + 1) % timezones.length;
+      document.getElementById('tzLabel').innerText = timezones[currentTzIdx].label;
+      showToast(`Timezone switched to ${timezones[currentTzIdx].label}`);
+    }
+
+    // Manual Refresh Telemetry Action
+    function manualRefresh() {
+      const icon = document.getElementById('refreshIcon');
+      icon.classList.add('animate-spin');
+      simulateTelemetry();
+      setTimeout(() => {
+        icon.classList.remove('animate-spin');
+        showToast("Telemetry metrics refreshed from Azure Host.");
+      }, 700);
+    }
+
+    // Copy to Clipboard with Toast
+    function copyToClipboard(text, message) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(message || "Copied to clipboard!");
+      }).catch(() => {
+        showToast("Copied: " + text);
+      });
+    }
+
+    // Elegant Toast Notification
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = "flex items-center gap-2 px-4 py-2.5 rounded-lg bg-obsidian-surface border border-cyber-iris/40 shadow-xl text-xs font-mono text-platinum transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto";
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-quantum-cyan shadow-[0_0_8px_#00F2FE]"></span>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+
+      // Animate In
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      // Animate Out & Remove
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,2392 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Yudiaz Sentinel — High-Performance Zero-Overhead VPS Telemetry & AI Agent Cluster Command Console">
+  <meta name="theme-color" content="#07090E">
+  <title>YUDIAZ SENTINEL // VPS Telemetry & AI Agent Hub</title>
+
+  <!-- Official Yudiaz Concept 2B Favicons -->
+  <link rel="icon" type="image/svg+xml" href="assets/yudiaz-logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+  <link rel="apple-touch-icon" sizes="64x64" href="assets/favicon-64.png">
+
+  <!-- Typography: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            obsidian: {
+              core: "#07090E",
+              panel: "#0E131F",
+              elevated: "#141A29",
+              hover: "#1A2236",
+              border: "#1E293B",
+              borderLight: "#334155"
+            },
+            cyber: {
+              iris: "#6366F1",
+              glow: "rgba(99, 102, 241, 0.35)"
+            },
+            quantum: {
+              cyan: "#00F2FE",
+              glow: "rgba(0, 242, 254, 0.4)"
+            },
+            status: {
+              online: "#10B981",
+              warning: "#F59E0B",
+              critical: "#EF4444",
+              standby: "#64748B"
+            },
+            platinum: "#F8FAFC",
+            slateMuted: "#94A3B8"
+          },
+          fontFamily: {
+            sans: ["Plus Jakarta Sans", "system-ui", "-apple-system", "sans-serif"],
+            mono: ["JetBrains Mono", "Fira Code", "monospace"]
+          },
+          animation: {
+            "beacon": "beacon 2s cubic-bezier(0, 0, 0.2, 1) infinite",
+            "pulse-fast": "pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+          },
+          keyframes: {
+            beacon: {
+              "0%": { transform: "scale(1)", opacity: "0.8" },
+              "75%, 100%": { transform: "scale(2.5)", opacity: "0" },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #07090E;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1E293B;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Glassmorphism Luxury Panels & Cards */
+    .glass-panel {
+      background: rgba(14, 19, 31, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-panel:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+    .glass-card {
+      background: rgba(20, 26, 41, 0.68);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      background: rgba(26, 34, 54, 0.88);
+      border-color: rgba(0, 242, 254, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px -4px rgba(0, 242, 254, 0.12);
+    }
+
+    /* Radial Meter Gauge */
+    .circle-meter-bg {
+      stroke: #1E293B;
+      stroke-linecap: round;
+    }
+    .circle-meter-val {
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.8s ease-in-out;
+    }
+
+    /* Brutalist Architectural Grid Overlay */
+    .grid-bg-overlay {
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    /* WCAG 2.1 AA Focus-Visible Accessibility */
+    button:focus-visible, a:focus-visible {
+      outline: 2px solid #00F2FE !important;
+      outline-offset: 2px !important;
+    }
+
+    /* Prefers-reduced-motion Support */
+    @media (prefers-reduced-motion: reduce) {
+      .animate-beacon, .animate-spin, .animate-pulse {
+        animation: none !important;
+      }
+      .circle-meter-val, .glass-card, .transition-all {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-obsidian-core text-slate-300 font-sans min-h-screen selection:bg-cyber-iris selection:text-white relative overflow-x-hidden">
+
+  <!-- Ambient Luxury Backdrops -->
+  <div class="fixed top-0 left-1/4 w-[600px] h-[350px] bg-cyber-iris/10 rounded-full blur-[140px] pointer-events-none -z-10" aria-hidden="true"></div>
+  <div class="fixed top-1/3 right-10 w-[500px] h-[400px] bg-quantum-cyan/5 rounded-full blur-[160px] pointer-events-none -z-10" aria-hidden="true"></div>
+  <div class="fixed inset-0 grid-bg-overlay pointer-events-none -z-10 opacity-70" aria-hidden="true"></div>
+
+  <!-- Interactive Toast Notification Container (WCAG Live Region) -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ========================================== -->
+  <!-- HEADER: GLOBAL COMMAND & STATUS BAR        -->
+  <!-- ========================================== -->
+  <header class="sticky top-0 z-40 border-b border-obsidian-border bg-obsidian-core/90 backdrop-blur-md" role="banner">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+
+      <!-- Brand & Host Monogram -->
+      <div class="flex items-center gap-3.5">
+        <!-- Yudiaz Concept 2B Official Master Brandmark (Negative Space Portal) -->
+        <a href="/" class="group flex items-center gap-3 focus-visible:ring-2 focus-visible:ring-quantum-cyan rounded-lg p-0.5" title="Yudiaz Sentinel Home" aria-label="Yudiaz Sentinel Console Home">
+          <div class="w-9 h-9 rounded-lg bg-obsidian-panel border border-obsidian-border flex items-center justify-center p-1.5 shadow-lg group-hover:border-quantum-cyan transition-colors">
+            <svg viewBox="0 0 500 500" class="w-full h-full" fill="none" role="img" aria-label="Official Yudiaz Brandmark Concept 2B">
+              <!-- Left Monolith (D Spine) -->
+              <path d="M 118 100 L 182 100 L 236 218 Q 238 222 238 228 L 238 400 L 118 400 Z" fill="#F8FAFC" class="group-hover:fill-quantum-cyan transition-colors"/>
+              <!-- Right Monolith (D Arch & Cutout) -->
+              <path d="M 264 400 L 264 228 Q 264 222 266 218 L 318 100 C 370 100, 412 158, 412 250 C 412 342, 370 400, 264 400 Z" fill="#F8FAFC" class="group-hover:fill-quantum-cyan transition-colors"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-extrabold tracking-[0.16em] text-platinum font-sans">YUDIAZ SENTINEL</span>
+              <span id="systemModeBadge" class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-cyber-iris/20 text-cyber-iris border border-cyber-iris/40">v1.0-LIVE</span>
+            </div>
+            <button onclick="copyToClipboard('vps.daniandraaa.my.id', 'Domain URL copied to clipboard!')" class="text-[11px] font-mono text-slate-400 flex items-center gap-1.5 hover:text-white transition-colors" title="Click to copy domain">
+              <span class="text-quantum-cyan">host:</span>
+              <span class="text-slate-300 underline decoration-dotted underline-offset-2">vps.daniandraaa.my.id</span>
+              <span class="text-slate-600">//</span>
+              <span class="text-slate-500">Seoul, KR</span>
+            </button>
+          </div>
+        </a>
+      </div>
+
+      <!-- Center: Status Telemetry Pill -->
+      <div class="hidden md:flex items-center gap-6 px-4 py-1.5 rounded-full bg-obsidian-panel border border-obsidian-border text-xs font-mono">
+        <!-- Live Node Pulse -->
+        <div class="flex items-center gap-2" id="hostStatusPill">
+          <span class="relative flex h-2.5 w-2.5" aria-hidden="true">
+            <span id="beaconPing" class="animate-beacon absolute inline-flex h-full w-full rounded-full bg-status-online opacity-75"></span>
+            <span id="beaconDot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-status-online"></span>
+          </span>
+          <span id="hostStatusText" class="font-bold text-emerald-400 tracking-wider">HOST ONLINE</span>
+        </div>
+
+        <div class="h-3 w-px bg-obsidian-border" aria-hidden="true"></div>
+
+        <!-- Uptime Ticker -->
+        <div class="flex items-center gap-1.5" title="System Continuous Uptime">
+          <span class="text-slate-500">UPTIME</span>
+          <span id="uptimeDisplay" class="text-platinum font-semibold tabular-nums">14d 08h 22m 45s</span>
+        </div>
+
+        <div class="h-3 w-px bg-obsidian-border" aria-hidden="true"></div>
+
+        <!-- Ping Latency -->
+        <div class="flex items-center gap-1.5" title="Round-Trip Gateway Latency">
+          <span class="text-slate-500">PING</span>
+          <span id="pingDisplay" class="text-quantum-cyan font-semibold tabular-nums">14ms</span>
+          <span id="pingBadge" class="text-[9px] text-emerald-400 font-bold bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">NOMINAL</span>
+        </div>
+      </div>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-2">
+        <!-- Quick Copy IP Button -->
+        <button onclick="copyToClipboard('20.200.220.190', 'Host IP (20.200.220.190) copied!')" title="Copy Public IP: 20.200.220.190" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-obsidian-panel border border-obsidian-border hover:border-quantum-cyan text-xs font-mono text-slate-300 hover:text-white transition-all">
+          <svg class="w-3.5 h-3.5 text-quantum-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          <span>IP: 20.200.220.190</span>
+        </button>
+
+        <!-- Refresh Telemetry Button -->
+        <button id="refreshBtn" onclick="manualRefresh()" title="Synchronize Telemetry" class="p-2 rounded-lg bg-obsidian-panel border border-obsidian-border hover:border-slate-500 text-slate-300 hover:text-white transition-all active:scale-95" aria-label="Refresh Telemetry">
+          <svg id="refreshIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+
+        <!-- Timezone Switcher -->
+        <button onclick="toggleTimezone()" id="tzButton" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-obsidian-panel border border-obsidian-border hover:border-slate-500 text-[11px] font-mono text-slate-300 transition-colors" title="Toggle Display Timezone">
+          <span class="text-slate-500">TZ:</span>
+          <span id="tzLabel" class="text-quantum-cyan font-bold">WIB (UTC+7)</span>
+        </button>
+
+        <!-- Direct CLI / System Logs Trigger -->
+        <button onclick="openSystemLogsModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyber-iris/15 border border-cyber-iris/30 text-cyber-iris hover:bg-cyber-iris/25 hover:border-cyber-iris text-xs font-semibold tracking-wide transition-all" aria-label="Open CLI Logs Modal">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>CLI LOGS</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- MAIN TELEMETRY DASHBOARD                   -->
+  <!-- ========================================== -->
+  <main class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6" role="main">
+
+    <!-- ========================================== -->
+    <!-- SECTION 1: HARDWARE TELEMETRY TRI-GAUGES   -->
+    <!-- ========================================== -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-5" aria-label="Hardware Telemetry Matrix">
+
+      <!-- 1. vCPU 4-Core Telemetry Card -->
+      <article class="glass-panel rounded-xl p-5 border border-obsidian-border relative overflow-hidden flex flex-col justify-between">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="p-1 rounded bg-cyber-iris/20 text-cyber-iris border border-cyber-iris/30" aria-hidden="true">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M3 9h2m-2 6h2m16-6h2m-2 6h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+              </span>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-platinum font-mono">vCPU Subsystem</h2>
+            </div>
+            <p id="cpuModelSub" class="text-[11px] text-slate-400 mt-0.5">Intel Xeon 8370C // 4 Virtual Cores</p>
+          </div>
+          <div class="text-right">
+            <span id="cpuTotalUsage" class="text-2xl font-mono font-bold text-platinum tracking-tight tabular-nums">24.8%</span>
+            <span id="cpuStatusTag" class="block text-[10px] text-emerald-400 font-mono font-semibold">ALL CORES OK</span>
+          </div>
+        </div>
+
+        <!-- 60s Sparkline SVG Graph -->
+        <div class="my-2 bg-obsidian-elevated/80 rounded-lg p-2.5 border border-obsidian-border/60">
+          <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 mb-1">
+            <span>ACTIVITY SPARKLINE (60s)</span>
+            <span id="sparklineAvgText" class="text-quantum-cyan">AVG: 24.8%</span>
+          </div>
+          <svg id="cpuSparkline" viewBox="0 0 300 48" class="w-full h-12 overflow-visible" role="img" aria-label="Real-time 60-second CPU Usage Sparkline">
+            <defs>
+              <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6366F1" stop-opacity="0.45"/>
+                <stop offset="100%" stop-color="#6366F1" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <path id="sparkArea" d="M0,40 L0,32 L25,30 L50,38 L75,25 L100,28 L125,18 L150,22 L175,30 L200,16 L225,24 L250,15 L275,20 L300,18 L300,48 L0,48 Z" fill="url(#sparkGrad)" />
+            <path id="sparkLine" d="M0,32 L25,30 L50,38 L75,25 L100,28 L125,18 L150,22 L175,30 L200,16 L225,24 L250,15 L275,20 L300,18" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </div>
+
+        <!-- 4 Individual Core Bars -->
+        <div class="space-y-1.5 pt-1" id="coreBarsContainer">
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-400">Core 0 (2.80GHz)</span>
+            <div class="w-32 bg-obsidian-border rounded-full h-1.5 overflow-hidden">
+              <div id="core0Bar" class="bg-gradient-to-r from-cyber-iris to-quantum-cyan h-full rounded-full transition-all duration-500" style="width: 38%"></div>
+            </div>
+            <span id="core0Val" class="text-slate-300 w-8 text-right font-semibold tabular-nums">38%</span>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-400">Core 1 (2.80GHz)</span>
+            <div class="w-32 bg-obsidian-border rounded-full h-1.5 overflow-hidden">
+              <div id="core1Bar" class="bg-gradient-to-r from-cyber-iris to-quantum-cyan h-full rounded-full transition-all duration-500" style="width: 21%"></div>
+            </div>
+            <span id="core1Val" class="text-slate-300 w-8 text-right font-semibold tabular-nums">21%</span>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-400">Core 2 (2.80GHz)</span>
+            <div class="w-32 bg-obsidian-border rounded-full h-1.5 overflow-hidden">
+              <div id="core2Bar" class="bg-gradient-to-r from-cyber-iris to-quantum-cyan h-full rounded-full transition-all duration-500" style="width: 29%"></div>
+            </div>
+            <span id="core2Val" class="text-slate-300 w-8 text-right font-semibold tabular-nums">29%</span>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-400">Core 3 (2.80GHz)</span>
+            <div class="w-32 bg-obsidian-border rounded-full h-1.5 overflow-hidden">
+              <div id="core3Bar" class="bg-gradient-to-r from-cyber-iris to-quantum-cyan h-full rounded-full transition-all duration-500" style="width: 12%"></div>
+            </div>
+            <span id="core3Val" class="text-slate-300 w-8 text-right font-semibold tabular-nums">12%</span>
+          </div>
+        </div>
+
+        <!-- Load Averages Badges -->
+        <div class="mt-3 pt-2.5 border-t border-obsidian-border/70 flex items-center justify-between text-[10px] font-mono">
+          <span class="text-slate-500">LOAD AVG</span>
+          <div class="flex gap-2">
+            <span class="px-1.5 py-0.5 rounded bg-obsidian-elevated border border-obsidian-border text-slate-300"><span class="text-slate-500">1m:</span> <span id="load1m">0.42</span></span>
+            <span class="px-1.5 py-0.5 rounded bg-obsidian-elevated border border-obsidian-border text-slate-300"><span class="text-slate-500">5m:</span> <span id="load5m">0.38</span></span>
+            <span class="px-1.5 py-0.5 rounded bg-obsidian-elevated border border-obsidian-border text-slate-300"><span class="text-slate-500">15m:</span> <span id="load15m">0.31</span></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2. Memory RAM 54 GiB Telemetry Card -->
+      <article class="glass-panel rounded-xl p-5 border border-obsidian-border relative overflow-hidden flex flex-col justify-between">
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="p-1 rounded bg-quantum-cyan/20 text-quantum-cyan border border-quantum-cyan/30" aria-hidden="true">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </span>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-platinum font-mono">Memory Subsystem</h2>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-0.5">54 GiB High-Density ECC DDR4</p>
+          </div>
+          <div class="text-right">
+            <span id="ramPercentText" class="text-2xl font-mono font-bold text-quantum-cyan tracking-tight tabular-nums">34.1%</span>
+            <span id="ramHeadlineVal" class="block text-[10px] text-slate-400 font-mono">18.4 / 54.0 GiB</span>
+          </div>
+        </div>
+
+        <!-- Radial Gauge & Split Breakdown -->
+        <div class="flex items-center justify-around py-3">
+          <!-- Circular SVG Gauge -->
+          <div class="relative w-28 h-28 flex items-center justify-center">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100" role="img" aria-label="Circular RAM Utilization Gauge">
+              <circle cx="50" cy="50" r="40" class="circle-meter-bg fill-none" stroke-width="8"></circle>
+              <!-- 251.2 is circumference (2 * PI * 40). 34.1% = offset ~165 -->
+              <circle id="ramRadialCircle" cx="50" cy="50" r="40" fill="none" stroke="url(#ramGrad)" stroke-width="8" class="circle-meter-val" stroke-dasharray="251.2" stroke-dashoffset="165"></circle>
+              <defs>
+                <linearGradient id="ramGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#00F2FE" />
+                  <stop offset="100%" stop-color="#6366F1" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span id="ramTotalCenter" class="text-xs font-mono font-bold text-platinum">54 GiB</span>
+              <span class="text-[9px] font-mono text-slate-400 uppercase tracking-wider">TOTAL</span>
+            </div>
+          </div>
+
+          <!-- Linear Detailed Distribution -->
+          <div class="space-y-2 text-xs font-mono w-44">
+            <div class="flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-cyber-iris" aria-hidden="true"></span>
+                <span>Active:</span>
+              </span>
+              <span id="ramActiveVal" class="text-platinum font-semibold tabular-nums">18.4 GiB</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-quantum-cyan" aria-hidden="true"></span>
+                <span>Buffers/Cache:</span>
+              </span>
+              <span id="ramCachedVal" class="text-slate-300 font-semibold tabular-nums">12.1 GiB</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-slate-400">
+                <span class="w-2 h-2 rounded-full bg-slate-600" aria-hidden="true"></span>
+                <span>Available Free:</span>
+              </span>
+              <span id="ramFreeVal" class="text-slate-400 tabular-nums">23.5 GiB</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stacked Linear Bar -->
+        <div class="w-full bg-obsidian-border rounded-full h-2 overflow-hidden flex mb-2" id="ramStackedBar" role="progressbar" aria-label="RAM Allocation Ratio">
+          <div id="ramStackedActive" style="width: 34%" class="bg-cyber-iris h-full transition-all duration-500" title="Active"></div>
+          <div id="ramStackedCache" style="width: 22%" class="bg-quantum-cyan h-full transition-all duration-500" title="Cached"></div>
+          <div id="ramStackedFree" style="width: 44%" class="bg-slate-700/60 h-full transition-all duration-500" title="Free"></div>
+        </div>
+
+        <!-- Swap Bar -->
+        <div class="pt-2 border-t border-obsidian-border/70 flex items-center justify-between text-[10px] font-mono">
+          <span class="text-slate-500">SWAP MEMORY</span>
+          <div class="flex items-center gap-2">
+            <div class="w-20 bg-obsidian-border rounded-full h-1 overflow-hidden">
+              <div id="swapBar" class="bg-emerald-400 h-full" style="width: 1%"></div>
+            </div>
+            <span id="swapVal" class="text-emerald-400 font-bold">0 MB / 8.0 GiB (OPTIMAL)</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3. NVMe Storage & I/O Telemetry Card -->
+      <article class="glass-panel rounded-xl p-5 border border-obsidian-border relative overflow-hidden flex flex-col justify-between">
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="p-1 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30" aria-hidden="true">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7C5 4 4 5 4 7zM9 12h6m-6 4h4" />
+                </svg>
+              </span>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-platinum font-mono">NVMe Storage Array</h2>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Azure Ultra NVMe Gen4 // Dual Tier</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-mono font-bold">HEALTHY</span>
+            <span class="block text-[10px] text-slate-400 font-mono mt-0.5">S.M.A.R.T VERIFIED</span>
+          </div>
+        </div>
+
+        <!-- Partition Split Bars -->
+        <div class="space-y-3 py-1">
+          <!-- Root / Partition -->
+          <div>
+            <div class="flex justify-between items-center text-xs font-mono mb-1">
+              <span class="text-slate-300 font-semibold">OS Root (/dev/root)</span>
+              <span class="text-slate-400"><strong id="diskRootUsed" class="text-platinum">19.5 GB</strong> / <span id="diskRootTotal">61.0 GB</span> <span id="diskRootPercent" class="text-quantum-cyan">(32%)</span></span>
+            </div>
+            <div class="w-full bg-obsidian-border rounded-full h-2 overflow-hidden">
+              <div id="diskRootBar" class="bg-gradient-to-r from-cyber-iris to-purple-500 h-full rounded-full transition-all duration-500" style="width: 32%"></div>
+            </div>
+          </div>
+
+          <!-- Ephemeral /mnt Partition -->
+          <div>
+            <div class="flex justify-between items-center text-xs font-mono mb-1">
+              <span class="text-slate-300 font-semibold">Ephemeral Fast Storage (/mnt)</span>
+              <span class="text-slate-400"><strong id="diskMntUsed" class="text-platinum">15.4 GB</strong> / <span id="diskMntTotal">110.0 GB</span> <span id="diskMntPercent" class="text-amber-400">(14%)</span></span>
+            </div>
+            <div class="w-full bg-obsidian-border rounded-full h-2 overflow-hidden">
+              <div id="diskMntBar" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-500" style="width: 14%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time I/O Telemetry Stats -->
+        <div class="grid grid-cols-3 gap-2 bg-obsidian-elevated/70 p-2 rounded-lg border border-obsidian-border text-center font-mono my-1">
+          <div>
+            <span class="text-[9px] text-slate-500 block uppercase">READ SPEED</span>
+            <span id="diskReadVal" class="text-xs font-bold text-quantum-cyan tabular-nums">4.2 MB/s</span>
+          </div>
+          <div>
+            <span class="text-[9px] text-slate-500 block uppercase">WRITE SPEED</span>
+            <span id="diskWriteVal" class="text-xs font-bold text-cyber-iris tabular-nums">1.8 MB/s</span>
+          </div>
+          <div>
+            <span class="text-[9px] text-slate-500 block uppercase">TOTAL IOPS</span>
+            <span id="diskIopsVal" class="text-xs font-bold text-platinum tabular-nums">420 req/s</span>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-obsidian-border/70 flex items-center justify-between text-[10px] font-mono">
+          <span class="text-slate-500">FILE SYSTEM</span>
+          <span class="text-slate-400 font-semibold">ext4 (rw,noatime,discard)</span>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: DUAL-COLUMN MAIN ARCHITECTURE   -->
+    <!-- ========================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT COLUMN: SYSTEM SPECIFICATIONS & ACTIVE PROJECTS (5 COLS) -->
+      <div class="lg:col-span-5 space-y-6">
+
+        <!-- 1. System Specifications Monolith Card -->
+        <section class="glass-panel rounded-xl p-5 border border-obsidian-border" aria-labelledby="specsHeading">
+          <div class="flex items-center justify-between pb-3 border-b border-obsidian-border mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-sm bg-quantum-cyan shadow-[0_0_8px_#00F2FE]" aria-hidden="true"></div>
+              <h3 id="specsHeading" class="text-xs font-bold tracking-wider uppercase text-platinum font-mono">System Architecture</h3>
+            </div>
+            <span id="specVmBadge" class="text-[10px] font-mono text-slate-400 bg-obsidian-elevated px-2 py-0.5 rounded border border-obsidian-border">AZURE CLOUD VM</span>
+          </div>
+
+          <!-- Specs Definition Grid -->
+          <div class="space-y-3 text-xs font-mono">
+            <!-- CPU -->
+            <div class="flex items-start justify-between py-1.5 border-b border-obsidian-border/50">
+              <span class="text-slate-400 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Processor:
+              </span>
+              <span id="specCpuModel" class="text-platinum text-right font-medium">Intel Xeon Platinum 8370C<br><span class="text-slate-400 text-[11px]">@ 2.80GHz (4 vCPU)</span></span>
+            </div>
+
+            <!-- RAM -->
+            <div class="flex items-center justify-between py-1.5 border-b border-obsidian-border/50">
+              <span class="text-slate-400 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M3 9h2m-2 6h2m16-6h2m-2 6h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Installed Memory:
+              </span>
+              <span id="specRam" class="text-platinum font-semibold">54.0 GiB High-Density ECC</span>
+            </div>
+
+            <!-- Datacenter -->
+            <div class="flex items-center justify-between py-1.5 border-b border-obsidian-border/50">
+              <span class="text-slate-400 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                Cloud Datacenter:
+              </span>
+              <span id="specRegion" class="text-quantum-cyan font-medium">Azure Seoul (Korea Central)</span>
+            </div>
+
+            <!-- OS & Kernel -->
+            <div class="flex items-center justify-between py-1.5 border-b border-obsidian-border/50">
+              <span class="text-slate-400 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                OS & Kernel:
+              </span>
+              <span id="specOsKernel" class="text-platinum text-right">Ubuntu 24.04 LTS<br><span class="text-slate-500 text-[10px]">Kernel 6.17.0-1022-azure</span></span>
+            </div>
+
+            <!-- Public IP with Copy -->
+            <div class="flex items-center justify-between pt-2">
+              <span class="text-slate-400 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                Public IP:
+              </span>
+              <div class="flex items-center gap-1.5 bg-obsidian-elevated px-2.5 py-1 rounded border border-obsidian-border hover:border-quantum-cyan transition-colors">
+                <code id="publicIpText" class="text-quantum-cyan font-bold">20.200.220.190</code>
+                <button onclick="copyToClipboard('20.200.220.190', 'Public IP (20.200.220.190) Copied!')" class="text-slate-400 hover:text-white transition-colors" title="Copy Host Public IP" aria-label="Copy Public IP Address">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Projects Showcase: Live Deployed Projects & Subdomains -->
+        <section class="glass-panel rounded-xl p-5 border border-obsidian-border space-y-4" aria-labelledby="projectsHeading">
+          <div class="flex items-center justify-between pb-3 border-b border-obsidian-border">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.2)]" aria-hidden="true">
+                <span class="text-sm">🌐</span>
+              </div>
+              <div>
+                <h3 id="projectsHeading" class="text-xs sm:text-sm font-bold tracking-wider uppercase text-platinum font-mono flex items-center gap-2">
+                  <span>Live Deployed Projects &amp; Subdomains</span>
+                </h3>
+                <p class="text-[10px] text-slate-400 font-mono mt-0.5">Active Production Subdomains &amp; Verified Endpoints</p>
+              </div>
+            </div>
+            <span id="activeDeployedProjectsBadge" class="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]">3 ONLINE</span>
+          </div>
+
+          <!-- Live Deployed Project Cards Container -->
+          <div class="space-y-3" id="deployedProjectsList">
+
+            <!-- Card 1: Yudiaz Sentinel -->
+            <article class="glass-card rounded-xl p-4 border border-obsidian-border relative group hover:border-quantum-cyan/50 transition-all duration-300">
+              <div class="flex items-start justify-between gap-3 mb-2.5">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-lg bg-quantum-cyan/15 border border-quantum-cyan/40 text-quantum-cyan flex items-center justify-center font-mono text-xs font-bold shrink-0 shadow-[0_0_12px_rgba(0,242,254,0.25)] group-hover:scale-105 transition-transform">
+                    YS
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h4 class="text-xs sm:text-sm font-bold text-platinum font-mono truncate">Yudiaz Sentinel</h4>
+                      <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">PORT 9229</span>
+                      <span class="inline-flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                        <svg class="w-2.5 h-2.5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v2H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1V6a4 4 0 00-4-4zm2 6V6a2 2 0 10-4 0v2h4z" clip-rule="evenodd"/></svg>
+                        TLS 1.3 SECURE
+                      </span>
+                    </div>
+                    <a href="https://vps.daniandraaa.my.id" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-mono text-quantum-cyan hover:text-white hover:underline mt-0.5 truncate max-w-full group/link rounded" title="Open https://vps.daniandraaa.my.id">
+                      <span class="truncate">https://vps.daniandraaa.my.id</span>
+                      <svg class="w-3 h-3 shrink-0 opacity-70 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 px-2 py-1 rounded border border-emerald-500/30 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.15)] shrink-0">
+                  <span class="relative flex h-2 w-2" aria-hidden="true">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span class="text-[9px] sm:text-[10px] font-mono font-bold text-emerald-400 tracking-wide whitespace-nowrap">ONLINE / 200 OK</span>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-300 leading-relaxed mb-3 font-sans line-clamp-2">
+                Real-time VPS Telemetry, Hardware Observability &amp; Multi-Agent Command Console.
+              </p>
+
+              <div class="flex items-center gap-2 pt-2.5 border-t border-obsidian-border/60">
+                <a href="https://vps.daniandraaa.my.id" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-cyber-iris hover:bg-indigo-600 text-white font-mono text-xs font-semibold shadow-[0_0_12px_rgba(99,102,241,0.35)] hover:shadow-[0_0_18px_rgba(99,102,241,0.6)] active:scale-[0.98] transition-all" title="Launch Yudiaz Sentinel in new tab">
+                  <span>Open Project</span>
+                  <span class="text-xs font-bold">↗</span>
+                </a>
+                <button onclick="copyToClipboard('https://vps.daniandraaa.my.id', 'Yudiaz Sentinel URL (https://vps.daniandraaa.my.id) Copied!')" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-obsidian-elevated hover:bg-obsidian-hover border border-obsidian-border hover:border-slate-500 text-slate-300 hover:text-white font-mono text-xs active:scale-[0.98] transition-all" title="Copy URL: https://vps.daniandraaa.my.id" aria-label="Copy URL for Yudiaz Sentinel">
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  <span>Copy URL</span>
+                </button>
+              </div>
+            </article>
+
+            <!-- Card 2: 9Router AI Gateway -->
+            <article class="glass-card rounded-xl p-4 border border-obsidian-border relative group hover:border-cyber-iris/50 transition-all duration-300">
+              <div class="flex items-start justify-between gap-3 mb-2.5">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-lg bg-cyber-iris/15 border border-cyber-iris/40 text-cyber-iris flex items-center justify-center font-mono text-xs font-bold shrink-0 shadow-[0_0_12px_rgba(99,102,241,0.25)] group-hover:scale-105 transition-transform">
+                    9R
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h4 class="text-xs sm:text-sm font-bold text-platinum font-mono truncate">9Router AI Gateway</h4>
+                      <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">PORT 20128</span>
+                      <span class="inline-flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                        <svg class="w-2.5 h-2.5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v2H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1V6a4 4 0 00-4-4zm2 6V6a2 2 0 10-4 0v2h4z" clip-rule="evenodd"/></svg>
+                        TLS 1.3 SECURE
+                      </span>
+                    </div>
+                    <a href="https://api.daniandraaa.my.id" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-mono text-quantum-cyan hover:text-white hover:underline mt-0.5 truncate max-w-full group/link rounded" title="Open https://api.daniandraaa.my.id">
+                      <span class="truncate">https://api.daniandraaa.my.id</span>
+                      <svg class="w-3 h-3 shrink-0 opacity-70 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 px-2 py-1 rounded border border-emerald-500/30 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.15)] shrink-0">
+                  <span class="relative flex h-2 w-2" aria-hidden="true">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span class="text-[9px] sm:text-[10px] font-mono font-bold text-emerald-400 tracking-wide whitespace-nowrap">ONLINE / 200 OK</span>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-300 leading-relaxed mb-3 font-sans line-clamp-2">
+                Unified LLM Inference Proxy, Multi-Provider Fallback &amp; Virtualized API Keys.
+              </p>
+
+              <div class="flex items-center gap-2 pt-2.5 border-t border-obsidian-border/60">
+                <a href="https://api.daniandraaa.my.id" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-cyber-iris hover:bg-indigo-600 text-white font-mono text-xs font-semibold shadow-[0_0_12px_rgba(99,102,241,0.35)] hover:shadow-[0_0_18px_rgba(99,102,241,0.6)] active:scale-[0.98] transition-all" title="Launch 9Router AI Gateway in new tab">
+                  <span>Open Project</span>
+                  <span class="text-xs font-bold">↗</span>
+                </a>
+                <button onclick="copyToClipboard('https://api.daniandraaa.my.id', '9Router AI Gateway URL (https://api.daniandraaa.my.id) Copied!')" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-obsidian-elevated hover:bg-obsidian-hover border border-obsidian-border hover:border-slate-500 text-slate-300 hover:text-white font-mono text-xs active:scale-[0.98] transition-all" title="Copy URL: https://api.daniandraaa.my.id" aria-label="Copy URL for 9Router AI Gateway">
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  <span>Copy URL</span>
+                </button>
+              </div>
+            </article>
+
+            <!-- Card 3: Hermes Agent Engine -->
+            <article class="glass-card rounded-xl p-4 border border-obsidian-border relative group hover:border-emerald-500/50 transition-all duration-300">
+              <div class="flex items-start justify-between gap-3 mb-2.5">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-mono text-xs font-bold shrink-0 shadow-[0_0_12px_rgba(16,185,129,0.25)] group-hover:scale-105 transition-transform">
+                    HE
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h4 class="text-xs sm:text-sm font-bold text-platinum font-mono truncate">Hermes Agent Engine</h4>
+                      <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">PORT 9119</span>
+                      <span class="inline-flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                        <svg class="w-2.5 h-2.5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v2H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1V6a4 4 0 00-4-4zm2 6V6a2 2 0 10-4 0v2h4z" clip-rule="evenodd"/></svg>
+                        TLS 1.3 SECURE
+                      </span>
+                    </div>
+                    <a href="https://hermes.20.200.220.190.sslip.io" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-mono text-quantum-cyan hover:text-white hover:underline mt-0.5 truncate max-w-full group/link rounded" title="Open https://hermes.20.200.220.190.sslip.io">
+                      <span class="truncate">https://hermes.20.200.220.190.sslip.io</span>
+                      <svg class="w-3 h-3 shrink-0 opacity-70 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 px-2 py-1 rounded border border-emerald-500/30 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.15)] shrink-0">
+                  <span class="relative flex h-2 w-2" aria-hidden="true">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span class="text-[9px] sm:text-[10px] font-mono font-bold text-emerald-400 tracking-wide whitespace-nowrap">ONLINE / 200 OK</span>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-300 leading-relaxed mb-3 font-sans line-clamp-2">
+                Autonomous Multi-Profile AI Agent Execution Runtime &amp; Bridge Platform.
+              </p>
+
+              <div class="flex items-center gap-2 pt-2.5 border-t border-obsidian-border/60">
+                <a href="https://hermes.20.200.220.190.sslip.io" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-cyber-iris hover:bg-indigo-600 text-white font-mono text-xs font-semibold shadow-[0_0_12px_rgba(99,102,241,0.35)] hover:shadow-[0_0_18px_rgba(99,102,241,0.6)] active:scale-[0.98] transition-all" title="Launch Hermes Agent Engine in new tab">
+                  <span>Open Project</span>
+                  <span class="text-xs font-bold">↗</span>
+                </a>
+                <button onclick="copyToClipboard('https://hermes.20.200.220.190.sslip.io', 'Hermes Agent Engine URL (https://hermes.20.200.220.190.sslip.io) Copied!')" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-obsidian-elevated hover:bg-obsidian-hover border border-obsidian-border hover:border-slate-500 text-slate-300 hover:text-white font-mono text-xs active:scale-[0.98] transition-all" title="Copy URL: https://hermes.20.200.220.190.sslip.io" aria-label="Copy URL for Hermes Agent Engine">
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  <span>Copy URL</span>
+                </button>
+              </div>
+            </article>
+
+          </div>
+
+          <!-- Collapsible Background System Daemons & Port Listeners -->
+          <div class="pt-3 border-t border-obsidian-border/70">
+            <button onclick="toggleDaemonsList()" id="toggleDaemonsBtn" class="w-full flex items-center justify-between text-xs font-mono text-slate-400 hover:text-quantum-cyan transition-colors py-1 group/btn" aria-expanded="true">
+              <span class="flex items-center gap-2 font-bold uppercase tracking-wider text-[10px] sm:text-[11px]">
+                <span class="w-2 h-2 rounded-sm bg-cyber-iris shadow-[0_0_6px_#6366F1]"></span>
+                System Daemons &amp; Port Listeners
+              </span>
+              <div class="flex items-center gap-2">
+                <span id="activeProjectsCountBadge" class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">5 RUNNING</span>
+                <svg id="daemonsChevron" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+            </button>
+
+            <!-- Services List -->
+            <div id="daemonsCollapsible" class="mt-3 space-y-2">
+              <div class="space-y-2" id="servicesList">
+
+                <!-- Service 1: Hermes Agent Platform -->
+                <div class="glass-card rounded-lg p-2.5 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded bg-cyber-iris/15 border border-cyber-iris/30 flex items-center justify-center text-cyber-iris font-mono text-[11px] font-bold">
+                      H9
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <h4 class="text-xs font-bold text-platinum font-mono">Hermes Agent Platform</h4>
+                        <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">PORT 9119</span>
+                      </div>
+                      <p class="text-[10px] text-slate-400">Core Multi-Agent Orchestration &amp; Bridge</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="relative flex h-2 w-2" aria-hidden="true">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[10px] font-mono font-bold text-emerald-400">ONLINE</span>
+                  </div>
+                </div>
+
+                <!-- Service 2: 9Router AI Gateway -->
+                <div class="glass-card rounded-lg p-2.5 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded bg-quantum-cyan/15 border border-quantum-cyan/30 flex items-center justify-center text-quantum-cyan font-mono text-[11px] font-bold">
+                      9R
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <h4 class="text-xs font-bold text-platinum font-mono">9Router AI Gateway</h4>
+                        <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">PORT 20128</span>
+                      </div>
+                      <p class="text-[10px] text-slate-400">LLM Inference Proxy &amp; Failover Router</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="relative flex h-2 w-2" aria-hidden="true">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[10px] font-mono font-bold text-emerald-400">ONLINE</span>
+                  </div>
+                </div>
+
+                <!-- Service 3: Caddy TLS Reverse Proxy -->
+                <div class="glass-card rounded-lg p-2.5 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono text-[11px] font-bold">
+                      CD
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <h4 class="text-xs font-bold text-platinum font-mono">Caddy Reverse Proxy</h4>
+                        <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">PORT 443</span>
+                      </div>
+                      <p class="text-[10px] text-slate-400">Automated ACME TLS &amp; SSL Termination</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="relative flex h-2 w-2" aria-hidden="true">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[10px] font-mono font-bold text-emerald-400">ACTIVE</span>
+                  </div>
+                </div>
+
+                <!-- Service 4: Yudiaz Sentinel Observability -->
+                <div class="glass-card rounded-lg p-2.5 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded bg-quantum-cyan/20 border border-quantum-cyan flex items-center justify-center text-quantum-cyan font-mono text-[11px] font-bold">
+                      YS
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <h4 class="text-xs font-bold text-platinum font-mono">Yudiaz Sentinel</h4>
+                        <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">PORT 9229</span>
+                      </div>
+                      <p class="text-[10px] text-slate-400">Zero-Overhead Live Telemetry Daemon</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="relative flex h-2 w-2" aria-hidden="true">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[10px] font-mono font-bold text-emerald-400">ONLINE</span>
+                  </div>
+                </div>
+
+                <!-- Service 5: Yudiaz Studio Core Assets -->
+                <div class="glass-card rounded-lg p-2.5 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 font-mono text-[11px] font-bold">
+                      YD
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <h4 class="text-xs font-bold text-platinum font-mono">Yudiaz Studio Core Assets</h4>
+                        <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">LOCAL / CDN</span>
+                      </div>
+                      <p class="text-[10px] text-slate-400">Brand Vector Vault &amp; Master Tokens</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="inline-flex rounded-full h-2 w-2 bg-purple-400" aria-hidden="true"></span>
+                    <span class="text-[10px] font-mono font-bold text-purple-400">SYNCED</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT COLUMN: YUDIAZ AI AGENT TEAM HUB (7 COLS) -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- Agent Roster Hub Card -->
+        <section class="glass-panel rounded-xl p-5 border border-obsidian-border" aria-labelledby="agentHubHeading">
+
+          <!-- Header & Department Filters -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-obsidian-border mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-sm bg-purple-400 shadow-[0_0_8px_#C084FC]" aria-hidden="true"></div>
+                <h3 id="agentHubHeading" class="text-xs font-bold tracking-wider uppercase text-platinum font-mono">Yudiaz AI Agent Hub</h3>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5">9 Autonomous Agents Orchestrated on Azure Host</p>
+            </div>
+
+            <!-- Department Filter Tabs -->
+            <div class="flex items-center gap-1 bg-obsidian-elevated p-1 rounded-lg border border-obsidian-border text-[11px] font-mono" role="tablist" aria-label="Agent Department Filter">
+              <button onclick="filterAgents('all')" id="filterAll" role="tab" aria-selected="true" class="px-2.5 py-1 rounded bg-cyber-iris text-white font-semibold transition-all">All (9)</button>
+              <button onclick="filterAgents('dev')" id="filterDev" role="tab" aria-selected="false" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-all">Core Dev (7)</button>
+              <button onclick="filterAgents('support')" id="filterSupport" role="tab" aria-selected="false" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-all">Ops & Intel (2)</button>
+            </div>
+          </div>
+
+          <!-- Agent Roster Grid -->
+          <div id="agentRosterGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+
+            <!-- 1. Raziel Hendrix -->
+            <article class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('raziel')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')inspectAgent('raziel')" aria-label="View Raziel Hendrix Profile">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-cyber-iris/20 border border-cyber-iris flex items-center justify-center text-cyber-iris font-mono font-bold text-sm shadow-[0_0_12px_rgba(99,102,241,0.3)]">
+                  RH
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Raziel Hendrix</h4>
+                <p class="text-[11px] text-cyber-iris font-mono font-medium">CTO & Orchestrator</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Decomposing CEO brief, assigning subagents, orchestrating architecture.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-slate-400">HERMES: ACTIVE</span>
+              </div>
+            </article>
+
+            <!-- 2. Kael Ashford -->
+            <article class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('kael')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')inspectAgent('kael')" aria-label="View Kael Ashford Profile">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-quantum-cyan/20 border border-quantum-cyan flex items-center justify-center text-quantum-cyan font-mono font-bold text-sm shadow-[0_0_12px_rgba(0,242,254,0.3)]">
+                  KA
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Kael Ashford</h4>
+                <p class="text-[11px] text-quantum-cyan font-mono font-medium">Lead System Architect</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Designing system topology, DB schemas, and high-concurrency contracts.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-slate-400">ARCH: SPECS OK</span>
+              </div>
+            </article>
+
+            <!-- 3. Nara Vasquez -->
+            <article class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('nara')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')inspectAgent('nara')" aria-label="View Nara Vasquez Profile">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-sky-500/20 border border-sky-400 flex items-center justify-center text-sky-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(56,189,248,0.3)]">
+                  NV
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Nara Vasquez</h4>
+                <p class="text-[11px] text-sky-400 font-mono font-medium">Lead Tech Researcher</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Benchmarking AI models, paper discovery, and architectural feasibility.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-slate-400">RESEARCH: LIVE</span>
+              </div>
+            </article>
+
+            <!-- 4. Senna Louviere -->
+            <article class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('senna')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')inspectAgent('senna')" aria-label="View Senna Louviere Profile">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-rose-500/20 border border-rose-400 flex items-center justify-center text-rose-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(244,63,94,0.3)]">
+                  SL
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" aria-hidden="true"></span> ACTIVE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Senna Louviere</h4>
+                <p class="text-[11px] text-rose-400 font-mono font-medium">Creative Director</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Curating Dark Luxury Brutalism, design system tokens, and UI mockups.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-rose-400">DESIGNING UI</span>
+              </div>
+            </article>
+
+            <!-- 5. Idris Nakamura -->
+            <article class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('idris')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')inspectAgent('idris')" aria-label="View Idris Nakamura Profile">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                  IN
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Idris Nakamura</h4>
+                <p class="text-[11px] text-emerald-400 font-mono font-medium">Senior Dev & DevOps</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  FastAPI telemetry engine, systemd units, Docker probes, Azure cloud ops.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-emerald-400">BACKEND: READY</span>
+              </div>
+            </article>
+
+            <!-- 6. Mika Stellan -->
+            <article class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer ring-1 ring-violet-500/40" data-dept="dev" onclick="inspectAgent('mika')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')inspectAgent('mika')" aria-label="View Mika Stellan Profile">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-violet-500/20 border border-violet-400 flex items-center justify-center text-violet-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(168,85,247,0.3)]">
+                  MS
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true"></span> BUSY
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Mika Stellan</h4>
+                <p class="text-[11px] text-violet-400 font-mono font-medium">Frontend Engineer</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Pixel-perfect UI, real-time SSE streaming, SVG gauges, and WCAG 2.1 AA.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-amber-400">DASHBOARD LIVE</span>
+              </div>
+            </article>
+
+            <!-- 7. Viktor Moreau -->
+            <article class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="dev" onclick="inspectAgent('viktor')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')inspectAgent('viktor')" aria-label="View Viktor Moreau Profile">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-400 flex items-center justify-center text-amber-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                  VM
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-slate-400 bg-slate-500/10 px-1.5 py-0.5 rounded border border-slate-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400" aria-hidden="true"></span> STANDBY
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Viktor Moreau</h4>
+                <p class="text-[11px] text-amber-400 font-mono font-medium">Lead QA & Security</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Penetration tests, security audits, resilience verification, and quality gates.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>CORE DEV</span>
+                <span class="text-slate-400">AUDIT: 0 FAILS</span>
+              </div>
+            </article>
+
+            <!-- 8. Elara Sinclair -->
+            <article class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="support" onclick="inspectAgent('elara')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')inspectAgent('elara')" aria-label="View Elara Sinclair Profile">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-pink-500/20 border border-pink-400 flex items-center justify-center text-pink-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(236,72,153,0.3)]">
+                  ES
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Elara Sinclair</h4>
+                <p class="text-[11px] text-pink-400 font-mono font-medium">PA to CEO & Ops</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  CEO agenda dispatch, meal notifications, LinkedIn/IG executive surveillance.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>EXEC SUPPORT</span>
+                <span class="text-emerald-400">BRIEF READY</span>
+              </div>
+            </article>
+
+            <!-- 9. Jovan Aritza -->
+            <article class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer" data-dept="support" onclick="inspectAgent('jovan')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')inspectAgent('jovan')" aria-label="View Jovan Aritza Profile">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(6,182,212,0.3)]">
+                  JA
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" aria-hidden="true"></span> WATCHING
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-quantum-cyan transition-colors">Jovan Aritza</h4>
+                <p class="text-[11px] text-cyan-400 font-mono font-medium">Intelligence Officer</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  Telkom University surveillance, events scrape, academic bulletin alerts.
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-obsidian-border/60 flex items-center justify-between text-[9px] font-mono text-slate-500">
+                <span>INTEL & FIELD</span>
+                <span class="text-sky-400">TEL-U MONITOR</span>
+              </div>
+            </article>
+
+          </div>
+
+          <!-- Hub Footer Telemetry Dispatch Status -->
+          <div class="mt-4 pt-3 border-t border-obsidian-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-mono text-slate-400">
+            <span class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400" aria-hidden="true"></span>
+              <span>All 9 Agent Processes Bound to Port 9119 Subagent Bridge</span>
+            </span>
+            <span class="text-slate-500 text-[11px]">Orchestrated by Raziel Hendrix (CTO)</span>
+          </div>
+
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FOOTER: LUXURY BRUTALIST SIGN-OFF          -->
+    <!-- ========================================== -->
+    <footer class="mt-12 py-6 border-t border-obsidian-border/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500" role="contentinfo">
+      <div class="flex items-center gap-3">
+        <!-- Negative space monogram mini -->
+        <div class="w-5 h-5" aria-hidden="true">
+          <svg viewBox="0 0 500 500" class="w-full h-full fill-slate-500">
+            <path d="M 118 100 L 182 100 L 236 218 Q 238 222 238 228 L 238 400 L 118 400 Z" />
+            <path d="M 264 400 L 264 228 Q 264 222 266 218 L 318 100 C 370 100, 412 158, 412 250 C 412 342, 370 400, 264 400 Z" />
+          </svg>
+        </div>
+        <span>YUDIAZ CREATIVE STUDIO &copy; 2026 // ALL RIGHTS RESERVED</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-4 text-[11px]">
+        <span>CEO: <strong class="text-slate-300">Daniandra Prayudisty</strong></span>
+        <span class="text-obsidian-borderLight" aria-hidden="true">|</span>
+        <span>CTO: <strong class="text-slate-300">Raziel Hendrix</strong></span>
+        <span class="text-obsidian-borderLight" aria-hidden="true">|</span>
+        <span>ARCH: <strong class="text-slate-300">Kael Ashford</strong></span>
+        <span class="text-obsidian-borderLight" aria-hidden="true">|</span>
+        <span>DESIGN: <strong class="text-quantum-cyan">Senna Louviere</strong></span>
+        <span class="text-obsidian-borderLight" aria-hidden="true">|</span>
+        <span>FRONTEND: <strong class="text-violet-400">Mika Stellan</strong></span>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL 1: AGENT INSPECTOR DRAWER            -->
+  <!-- ========================================== -->
+  <div id="agentModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modalAgentName">
+    <div class="glass-panel w-full max-w-lg rounded-2xl p-6 border border-cyber-iris/40 shadow-2xl relative">
+      <button onclick="closeAgentModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-obsidian-elevated border border-obsidian-border" aria-label="Close Agent Profile">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+
+      <div class="flex items-center gap-4 pb-4 border-b border-obsidian-border">
+        <div id="modalAgentBadge" class="w-14 h-14 rounded-xl bg-cyber-iris/20 border border-cyber-iris flex items-center justify-center text-cyber-iris font-mono font-bold text-xl shadow-[0_0_15px_rgba(99,102,241,0.3)]">
+          --
+        </div>
+        <div>
+          <h3 id="modalAgentName" class="text-lg font-bold text-platinum font-sans">Agent Name</h3>
+          <p id="modalAgentRole" class="text-xs text-quantum-cyan font-mono font-semibold">Agent Role</p>
+          <span id="modalAgentStatus" class="inline-block mt-1 text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">ONLINE</span>
+        </div>
+      </div>
+
+      <div class="space-y-4 py-4 text-xs font-mono">
+        <div>
+          <span class="text-slate-400 block uppercase text-[10px]">Soul & Specialization:</span>
+          <p id="modalAgentSoul" class="text-slate-200 mt-1 leading-relaxed bg-obsidian-elevated p-3 rounded-lg border border-obsidian-border">Description text here</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-obsidian-elevated p-2.5 rounded-lg border border-obsidian-border">
+            <span class="text-slate-400 text-[10px] block">DEPARTMENT:</span>
+            <span id="modalAgentDept" class="text-platinum font-bold">Engineering</span>
+          </div>
+          <div class="bg-obsidian-elevated p-2.5 rounded-lg border border-obsidian-border">
+            <span class="text-slate-400 text-[10px] block">RUNTIME BRIDGE:</span>
+            <span id="modalAgentBridge" class="text-quantum-cyan font-bold">Hermes Subagent</span>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-slate-400 block uppercase text-[10px]">Agent Core Motto:</span>
+          <p id="modalAgentQuote" class="text-slate-400 italic mt-1 border-l-2 border-cyber-iris pl-3 py-1">"Quote here"</p>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-obsidian-border flex justify-end">
+        <button onclick="closeAgentModal()" class="px-4 py-2 rounded-lg bg-cyber-iris text-white text-xs font-semibold hover:bg-cyber-iris/90 transition-colors">Close Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL 2: SYSTEM LOGS & TELEMETRY STREAM   -->
+  <!-- ========================================== -->
+  <div id="logsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="logsModalHeading">
+    <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 border border-obsidian-border shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-obsidian-border">
+        <div class="flex items-center gap-2">
+          <span class="p-1 rounded bg-cyber-iris/20 text-cyber-iris" aria-hidden="true">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </span>
+          <h3 id="logsModalHeading" class="text-sm font-bold text-platinum font-mono">Live Kernel & Telemetry Log Stream</h3>
+        </div>
+        <button onclick="closeSystemLogsModal()" class="text-slate-400 hover:text-white p-1 rounded-lg bg-obsidian-elevated border border-obsidian-border" aria-label="Close Logs Modal">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="my-4 p-3 bg-obsidian-core rounded-lg border border-obsidian-border font-mono text-[11px] text-slate-300 h-64 overflow-y-auto space-y-1.5" id="terminalLogs" tabindex="0" aria-label="Terminal Log Entries">
+        <div class="text-emerald-400">[SYSTEM] Kernel 6.17.0-1022-azure initialized. 4 Cores active @ 2.80GHz.</div>
+        <div class="text-slate-400">[CADDY] Automated ACME TLS reverse proxy routing active for vps.daniandraaa.my.id.</div>
+        <div class="text-cyber-iris">[9ROUTER] Port 20128 upstream connected to OpenAI/Anthropic gateway.</div>
+        <div class="text-quantum-cyan">[HERMES] Port 9119 listening for multi-agent RPC dispatch. Active session: raziel-cto.</div>
+        <div class="text-slate-400">[SENTINEL] Ingress port 9229 bound. Zero-overhead async telemetry collector running.</div>
+        <div class="text-amber-400">[STORAGE] S.M.A.R.T NVMe check completed. Root /: 61GB, Ephemeral /mnt: 110GB.</div>
+        <div class="text-emerald-400">[AGENT] Raziel Hendrix heartbeat received: 100% operational.</div>
+        <div class="text-violet-400">[FRONTEND] Mika Stellan: Production dashboard hydrated with live SSE streaming engine.</div>
+      </div>
+
+      <div class="flex justify-between items-center pt-3 border-t border-obsidian-border text-xs font-mono text-slate-400">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping" aria-hidden="true"></span>
+          <span id="logStreamStatus">Listening to live kernel syslog & Sentinel telemetry</span>
+        </span>
+        <button onclick="clearLogs()" class="px-3 py-1 rounded bg-obsidian-elevated hover:bg-obsidian-hover border border-obsidian-border text-slate-300 transition-colors">Clear Buffer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- CLIENT LOGIC: SSE STREAM & REST FALLBACK   -->
+  <!-- ========================================== -->
+  <script>
+    // ----------------------------------------------------
+    // 1. Agent Roster Database & Metadata
+    // ----------------------------------------------------
+    const agentDatabase = {
+      raziel: {
+        id: "raziel",
+        name: "Raziel Hendrix",
+        role: "CTO & Orchestrator",
+        dept: "Engineering & Orchestration",
+        badge: "RH",
+        color: "text-cyber-iris",
+        border: "border-cyber-iris",
+        status: "ONLINE // ORCHESTRATING",
+        bridge: "Hermes Subagent #1",
+        soul: "Tegas, strategis, perfeksionis. Menerima brief dari CEO Daniandra Prayudisty, memecah masalah kompleks menjadi task terukur, mendelegasikan ke seluruh tim spesialis Yudiaz, dan melakukan final review sebelum deploy.",
+        quote: "Strategi tanpa eksekusi adalah halusinasi. Eksekusi tanpa strategi adalah kekacauan."
+      },
+      kael: {
+        id: "kael",
+        name: "Kael Ashford",
+        role: "Lead System Architect",
+        dept: "System Architecture",
+        badge: "KA",
+        color: "text-quantum-cyan",
+        border: "border-quantum-cyan",
+        status: "ONLINE // ACTIVE",
+        bridge: "Hermes Subagent #2",
+        soul: "Merancang arsitektur sistem, skema database tingkat tinggi, kontrak antarmuka API, dan struktur microservices untuk memastikan ketahanan beban server VPS.",
+        quote: "Arsitektur yang baik tidak terlihat sampai saat sistem diuji dengan jutaan request."
+      },
+      nara: {
+        id: "nara",
+        name: "Nara Vasquez",
+        role: "Lead Tech Researcher",
+        dept: "Research & Benchmarking",
+        badge: "NV",
+        color: "text-sky-400",
+        border: "border-sky-400",
+        status: "ONLINE // RESEARCHING",
+        bridge: "Hermes Subagent #3",
+        soul: "Melakukan riset teknologi terdepan, benchmarking model AI, eksplorasi paper arXiv, dan memberikan analisis kelayakan sebelum tim teknis membangun sistem.",
+        quote: "Kebenaran data adalah fondasi setiap inovasi cerdas."
+      },
+      senna: {
+        id: "senna",
+        name: "Senna Louviere",
+        role: "Creative Director",
+        dept: "Creative & UI/UX",
+        badge: "SL",
+        color: "text-rose-400",
+        border: "border-rose-400",
+        status: "ACTIVE // DESIGNING",
+        bridge: "Hermes Subagent #4",
+        soul: "Artistik, user-centric, modern brutalist-minimalist. Memastikan setiap komponen visual, design token, dan mockup memiliki estetika dark luxury premium dan berstandar WCAG 2.1 AA.",
+        quote: "Desain bukan soal cantik, tapi soal experience."
+      },
+      idris: {
+        id: "idris",
+        name: "Idris Nakamura",
+        role: "Senior Developer & DevOps",
+        dept: "Backend & Infrastructure",
+        badge: "IN",
+        color: "text-emerald-400",
+        border: "border-emerald-400",
+        status: "ONLINE // EXECUTING",
+        bridge: "Hermes Subagent #5",
+        soul: "Membangun endpoint API, mengelola runtime daemon, containerization, dan memastikan pipeline cloud Azure di VPS berjalan dengan efisiensi tinggi.",
+        quote: "Kode yang bersih adalah kode yang bisa dipahami dan dideploy tanpa rasa takut."
+      },
+      mika: {
+        id: "mika",
+        name: "Mika Stellan",
+        role: "Frontend Engineer",
+        dept: "Frontend Engineering",
+        badge: "MS",
+        color: "text-violet-400",
+        border: "border-violet-400",
+        status: "BUSY // CODING",
+        bridge: "Hermes Subagent #6",
+        soul: "Mengonversi spec desain dari Senna menjadi kode SPA interaktif, responsive, dan hemat daya render.",
+        quote: "Pixel-perfect bukan obsesi, itu standar."
+      },
+      viktor: {
+        id: "viktor",
+        name: "Viktor Moreau",
+        role: "Lead QA & Security",
+        dept: "QA & Security Audit",
+        badge: "VM",
+        color: "text-amber-400",
+        border: "border-amber-400",
+        status: "STANDBY // AUDITING",
+        bridge: "Hermes Subagent #7",
+        soul: "Melakukan audit keamanan, penetrasi vulnerability, verifikasi unit testing, dan pengujian keandalan sebelum sistem diluncurkan ke domain publik.",
+        quote: "Tidak ada sistem yang aman jika kita tidak mengujinya seperti seorang penyerang."
+      },
+      elara: {
+        id: "elara",
+        name: "Elara Sinclair",
+        role: "PA to CEO & Operations",
+        dept: "Executive Support",
+        badge: "ES",
+        color: "text-pink-400",
+        border: "border-pink-400",
+        status: "ONLINE // MONITORING",
+        bridge: "Hermes Subagent #8",
+        soul: "Asisten pribadi CEO Daniandra Prayudisty. Mengatur agenda harian, reminder makan dan nutrisi, monitoring sosial media LinkedIn dan Instagram.",
+        quote: "Jadwal Anda sudah saya atur, makan siang jangan lupa."
+      },
+      jovan: {
+        id: "jovan",
+        name: "Jovan Aritza",
+        role: "Intelligence Officer",
+        dept: "Intelligence & Field Surveillance",
+        badge: "JA",
+        color: "text-cyan-400",
+        border: "border-cyan-400",
+        status: "WATCHING // ACTIVE",
+        bridge: "Hermes Subagent #9",
+        soul: "Memantau seluruh aktivitas, pengumuman resmi, media sosial, dan tren seputar Telkom University untuk dilaporkan langsung ke CEO Daniandra.",
+        quote: "Kalau ada info penting soal Tel-U, saya yang pertama tahu."
+      }
+    };
+
+    // ----------------------------------------------------
+    // 2. Global State & Sparkline History
+    // ----------------------------------------------------
+    let uptimeSeconds = 14 * 86400 + 8 * 3600 + 22 * 60 + 45;
+    let sseActive = false;
+    let pollingIntervalId = null;
+    let eventSourceInstance = null;
+    let lastPingMs = 14;
+
+    // Sparkline history: 60 data points (default seed around 24%)
+    const sparklineHistory = [
+      22, 24, 25, 20, 18, 22, 28, 30, 26, 24, 
+      21, 23, 27, 29, 31, 25, 22, 24, 20, 23, 
+      28, 26, 24, 22, 21, 25, 30, 32, 28, 24, 
+      22, 20, 25, 27, 24, 23, 21, 26, 28, 30, 
+      25, 22, 24, 27, 29, 23, 21, 20, 24, 26, 
+      28, 25, 22, 23, 25, 27, 24, 22, 25, 24.8
+    ];
+
+    // ----------------------------------------------------
+    // 3. Sparkline SVG Rendering Engine
+    // ----------------------------------------------------
+    function renderSparkline(points) {
+      if (!points || points.length === 0) return;
+      const width = 300;
+      const height = 44;
+      const paddingBottom = 4;
+      const usableHeight = height - paddingBottom;
+
+      const step = width / (Math.max(points.length - 1, 1));
+      const coords = points.map((val, idx) => {
+        const x = idx * step;
+        const clampedVal = Math.max(0, Math.min(100, val));
+        const y = usableHeight - (clampedVal / 100) * (usableHeight - 4) + 2;
+        return { x, y };
+      });
+
+      let pathD = `M ${coords[0].x.toFixed(1)} ${coords[0].y.toFixed(1)}`;
+      for (let i = 1; i < coords.length; i++) {
+        pathD += ` L ${coords[i].x.toFixed(1)} ${coords[i].y.toFixed(1)}`;
+      }
+
+      const areaD = `${pathD} L ${width} 48 L 0 48 Z`;
+
+      const sparkLineElem = document.getElementById("sparkLine");
+      const sparkAreaElem = document.getElementById("sparkArea");
+      if (sparkLineElem) sparkLineElem.setAttribute("d", pathD);
+      if (sparkAreaElem) sparkAreaElem.setAttribute("d", areaD);
+
+      const avg = (points.reduce((a, b) => a + b, 0) / points.length).toFixed(1);
+      const avgElem = document.getElementById("sparklineAvgText");
+      if (avgElem) avgElem.innerText = `AVG: ${avg}%`;
+    }
+
+    // ----------------------------------------------------
+    // 4. Live Uptime Ticker
+    // ----------------------------------------------------
+    function updateUptimeTicker() {
+      uptimeSeconds++;
+      const days = Math.floor(uptimeSeconds / 86400);
+      const hours = Math.floor((uptimeSeconds % 86400) / 3600);
+      const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+      const seconds = uptimeSeconds % 60;
+
+      const pad = (n) => String(n).padStart(2, "0");
+      const displayElem = document.getElementById("uptimeDisplay");
+      if (displayElem) {
+        displayElem.innerText = `${days}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+      }
+    }
+    setInterval(updateUptimeTicker, 1000);
+
+    // ----------------------------------------------------
+    // 5. Telemetry Hydration & Metric Application
+    // ----------------------------------------------------
+    function applyTelemetry(payload) {
+      if (!payload) return;
+      // Extract data if enveloped in { success: true, data: { ... } }
+      const data = payload.data ? payload.data : payload;
+
+      // --- CPU Subsystem ---
+      let cpuPercent = null;
+      let perCore = null;
+      let loadAvg = null;
+
+      if (data.cpu) {
+        cpuPercent = data.cpu.overall_usage_percent !== undefined ? data.cpu.overall_usage_percent : data.cpu.totalPercent;
+        perCore = data.cpu.per_core_percent || data.cpu.cores;
+        if (data.cpu.load_average) {
+          loadAvg = [data.cpu.load_average.load_1m, data.cpu.load_average.load_5m, data.cpu.load_average.load_15m];
+        } else if (data.cpu.loadAvg) {
+          loadAvg = data.cpu.loadAvg;
+        }
+      } else if (data.cpu_percent !== undefined) {
+        cpuPercent = data.cpu_percent;
+        perCore = data.per_core;
+        if (data.load_1m !== undefined) {
+          loadAvg = [data.load_1m, data.load_5m || (data.load_1m * 0.9).toFixed(2), data.load_15m || (data.load_1m * 0.8).toFixed(2)];
+        }
+      }
+
+      if (cpuPercent !== null && cpuPercent !== undefined) {
+        const val = parseFloat(cpuPercent).toFixed(1);
+        const cpuTotalElem = document.getElementById("cpuTotalUsage");
+        if (cpuTotalElem) cpuTotalElem.innerText = `${val}%`;
+
+        // Push to sparkline history
+        sparklineHistory.push(parseFloat(val));
+        if (sparklineHistory.length > 60) sparklineHistory.shift();
+        renderSparkline(sparklineHistory);
+      }
+
+      if (Array.isArray(perCore) && perCore.length >= 4) {
+        for (let i = 0; i < 4; i++) {
+          const cVal = Math.round(perCore[i]);
+          const bar = document.getElementById(`core${i}Bar`);
+          const label = document.getElementById(`core${i}Val`);
+          if (bar) bar.style.width = `${Math.min(100, Math.max(2, cVal))}%`;
+          if (label) label.innerText = `${cVal}%`;
+        }
+      }
+
+      if (loadAvg && loadAvg.length >= 3) {
+        const l1 = document.getElementById("load1m");
+        const l5 = document.getElementById("load5m");
+        const l15 = document.getElementById("load15m");
+        if (l1) l1.innerText = Number(loadAvg[0]).toFixed(2);
+        if (l5) l5.innerText = Number(loadAvg[1]).toFixed(2);
+        if (l15) l15.innerText = Number(loadAvg[2]).toFixed(2);
+      }
+
+      // --- Memory Subsystem ---
+      let ramTotalGb = 54.0;
+      let ramUsedGb = null;
+      let ramCachedGb = null;
+      let ramFreeGb = null;
+      let ramPercent = null;
+
+      if (data.memory) {
+        ramTotalGb = data.memory.total_gb || (data.memory.total_bytes ? (data.memory.total_bytes / (1024**3)) : 54.0);
+        ramUsedGb = data.memory.used_gb !== undefined ? data.memory.used_gb : (data.memory.used_bytes ? (data.memory.used_bytes / (1024**3)) : null);
+        ramCachedGb = data.memory.cached_gb !== undefined ? data.memory.cached_gb : (data.memory.cached_bytes ? (data.memory.cached_bytes / (1024**3)) : null);
+        ramFreeGb = data.memory.free_gb !== undefined ? data.memory.free_gb : (data.memory.free_bytes ? (data.memory.free_bytes / (1024**3)) : null);
+        ramPercent = data.memory.used_percent !== undefined ? data.memory.used_percent : ((ramUsedGb / ramTotalGb) * 100);
+      } else if (data.ram) {
+        ramTotalGb = (data.ram.totalBytes / (1024**3)) || 54.0;
+        ramUsedGb = (data.ram.usedBytes / (1024**3));
+        ramCachedGb = (data.ram.cachedBytes / (1024**3));
+        ramFreeGb = (data.ram.freeBytes / (1024**3));
+        ramPercent = ((data.ram.usedBytes / data.ram.totalBytes) * 100);
+      } else if (data.ram_percent !== undefined) {
+        ramPercent = data.ram_percent;
+        ramUsedGb = data.ram_used_gb || ((ramPercent / 100) * 54.0);
+        ramFreeGb = data.ram_free_gb || (54.0 - ramUsedGb);
+        ramCachedGb = 12.1;
+      }
+
+      if (ramPercent !== null) {
+        const pNum = parseFloat(ramPercent).toFixed(1);
+        const ramPercentElem = document.getElementById("ramPercentText");
+        if (ramPercentElem) ramPercentElem.innerText = `${pNum}%`;
+
+        // Update SVG circle gauge (circumference 251.2)
+        const offset = 251.2 - (251.2 * (pNum / 100));
+        const circleElem = document.getElementById("ramRadialCircle");
+        if (circleElem) circleElem.style.strokeDashoffset = offset;
+
+        if (ramUsedGb !== null) {
+          const usedStr = parseFloat(ramUsedGb).toFixed(1);
+          const totalStr = parseFloat(ramTotalGb).toFixed(1);
+          const headline = document.getElementById("ramHeadlineVal");
+          if (headline) headline.innerText = `${usedStr} / ${totalStr} GiB`;
+
+          const activeElem = document.getElementById("ramActiveVal");
+          if (activeElem) activeElem.innerText = `${usedStr} GiB`;
+        }
+
+        if (ramCachedGb !== null) {
+          const cachedStr = parseFloat(ramCachedGb).toFixed(1);
+          const cachedElem = document.getElementById("ramCachedVal");
+          if (cachedElem) cachedElem.innerText = `${cachedStr} GiB`;
+        }
+
+        if (ramFreeGb !== null) {
+          const freeStr = parseFloat(ramFreeGb).toFixed(1);
+          const freeElem = document.getElementById("ramFreeVal");
+          if (freeElem) freeElem.innerText = `${freeStr} GiB`;
+        }
+
+        // Update stacked bar
+        const activeBar = document.getElementById("ramStackedActive");
+        const cacheBar = document.getElementById("ramStackedCache");
+        const freeBar = document.getElementById("ramStackedFree");
+        if (activeBar && cacheBar && freeBar && ramUsedGb !== null && ramCachedGb !== null) {
+          const activeRatio = (ramUsedGb / ramTotalGb) * 100;
+          const cacheRatio = (ramCachedGb / ramTotalGb) * 100;
+          const freeRatio = Math.max(0, 100 - activeRatio - cacheRatio);
+          activeBar.style.width = `${activeRatio.toFixed(1)}%`;
+          cacheBar.style.width = `${cacheRatio.toFixed(1)}%`;
+          freeBar.style.width = `${freeRatio.toFixed(1)}%`;
+        }
+      }
+
+      // --- Disks Subsystem ---
+      if (Array.isArray(data.disks)) {
+        data.disks.forEach(d => {
+          if (d.mountpoint === "/") {
+            const rootBar = document.getElementById("diskRootBar");
+            const rootUsed = document.getElementById("diskRootUsed");
+            const rootTotal = document.getElementById("diskRootTotal");
+            const rootP = document.getElementById("diskRootPercent");
+            if (rootBar) rootBar.style.width = `${d.used_percent}%`;
+            if (rootUsed) rootUsed.innerText = `${d.used_gb.toFixed(1)} GB`;
+            if (rootTotal) rootTotal.innerText = `${d.total_gb.toFixed(1)} GB`;
+            if (rootP) rootP.innerText = `(${d.used_percent}%)`;
+          } else if (d.mountpoint === "/mnt") {
+            const mntBar = document.getElementById("diskMntBar");
+            const mntUsed = document.getElementById("diskMntUsed");
+            const mntTotal = document.getElementById("diskMntTotal");
+            const mntP = document.getElementById("diskMntPercent");
+            if (mntBar) mntBar.style.width = `${d.used_percent}%`;
+            if (mntUsed) mntUsed.innerText = `${d.used_gb.toFixed(1)} GB`;
+            if (mntTotal) mntTotal.innerText = `${d.total_gb.toFixed(1)} GB`;
+            if (mntP) mntP.innerText = `(${d.used_percent}%)`;
+          }
+        });
+      } else if (data.disk_root_percent !== undefined) {
+        const rootBar = document.getElementById("diskRootBar");
+        const rootP = document.getElementById("diskRootPercent");
+        if (rootBar) rootBar.style.width = `${data.disk_root_percent}%`;
+        if (rootP) rootP.innerText = `(${data.disk_root_percent}%)`;
+
+        if (data.disk_mnt_percent !== undefined) {
+          const mntBar = document.getElementById("diskMntBar");
+          const mntP = document.getElementById("diskMntPercent");
+          if (mntBar) mntBar.style.width = `${data.disk_mnt_percent}%`;
+          if (mntP) mntP.innerText = `(${data.disk_mnt_percent}%)`;
+        }
+      }
+
+      // --- I/O Activity ---
+      if (data.disk && data.disk.io) {
+        const r = document.getElementById("diskReadVal");
+        const w = document.getElementById("diskWriteVal");
+        const io = document.getElementById("diskIopsVal");
+        if (r && data.disk.io.readSpeed) r.innerText = data.disk.io.readSpeed;
+        if (w && data.disk.io.writeSpeed) w.innerText = data.disk.io.writeSpeed;
+        if (io && data.disk.io.iops) io.innerText = `${data.disk.io.iops} req/s`;
+      }
+
+      // --- Uptime Sync ---
+      if (data.uptime && data.uptime.system_uptime_seconds) {
+        uptimeSeconds = data.uptime.system_uptime_seconds;
+      } else if (data.uptime_seconds) {
+        uptimeSeconds = data.uptime_seconds;
+      }
+    }
+
+    // ----------------------------------------------------
+    // 6. Real-Time SSE Stream & Robust Polling Fallback
+    // ----------------------------------------------------
+    function updateConnectionStatus(mode) {
+      const modeBadge = document.getElementById("systemModeBadge");
+      const statusText = document.getElementById("hostStatusText");
+      const beaconPing = document.getElementById("beaconPing");
+      const beaconDot = document.getElementById("beaconDot");
+
+      if (mode === "sse") {
+        if (modeBadge) {
+          modeBadge.innerText = "v1.0-LIVE (SSE)";
+          modeBadge.className = "text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
+        }
+        if (statusText) statusText.innerText = "STREAM LIVE";
+        if (beaconPing) beaconPing.className = "animate-beacon absolute inline-flex h-full w-full rounded-full bg-status-online opacity-75";
+        if (beaconDot) beaconDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-status-online";
+      } else if (mode === "poll") {
+        if (modeBadge) {
+          modeBadge.innerText = "v1.0-POLL (REST)";
+          modeBadge.className = "text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40";
+        }
+        if (statusText) statusText.innerText = "REST POLLING";
+        if (beaconPing) beaconPing.className = "animate-beacon absolute inline-flex h-full w-full rounded-full bg-status-warning opacity-75";
+        if (beaconDot) beaconDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-status-warning";
+      } else if (mode === "offline") {
+        if (modeBadge) {
+          modeBadge.innerText = "v1.0-STANDBY";
+          modeBadge.className = "text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-slate-500/20 text-slate-400 border border-slate-500/40";
+        }
+        if (statusText) statusText.innerText = "SIMULATION";
+      }
+    }
+
+    function initEventSource() {
+      if (!window.location.protocol.startsWith("http")) {
+        console.warn("[Sentinel] Running locally without HTTP server. Simulation mode active.");
+        updateConnectionStatus("offline");
+        startTelemetrySimulation();
+        return;
+      }
+
+      try {
+        if (eventSourceInstance) {
+          eventSourceInstance.close();
+        }
+
+        console.log("[Sentinel] Initializing SSE connection to /api/v1/metrics/stream");
+        eventSourceInstance = new EventSource("/api/v1/metrics/stream");
+
+        eventSourceInstance.onopen = () => {
+          sseActive = true;
+          console.log("[Sentinel] Live SSE stream connected.");
+          updateConnectionStatus("sse");
+          stopPolling();
+          appendTerminalLog("[SSE] Connected to real-time telemetry stream (2s ticker).", "text-emerald-400");
+        };
+
+        const handleEvent = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            applyTelemetry(data);
+          } catch (err) {
+            console.error("[Sentinel] SSE parse error:", err);
+          }
+        };
+
+        eventSourceInstance.onmessage = handleEvent;
+        eventSourceInstance.addEventListener("metric_tick", handleEvent);
+
+        eventSourceInstance.onerror = (err) => {
+          console.warn("[Sentinel] SSE connection dropped. Activating REST fallback polling.");
+          sseActive = false;
+          if (eventSourceInstance) {
+            eventSourceInstance.close();
+            eventSourceInstance = null;
+          }
+          startPolling();
+          setTimeout(initEventSource, 15000);
+        };
+      } catch (e) {
+        console.error("[Sentinel] Failed to establish EventSource:", e);
+        startPolling();
+      }
+    }
+
+    // ----------------------------------------------------
+    // 7. REST API Polling Fallback & Initial Hydration
+    // ----------------------------------------------------
+    function startPolling() {
+      if (pollingIntervalId) return;
+      updateConnectionStatus("poll");
+      appendTerminalLog("[FALLBACK] REST polling active: querying /api/v1/metrics every 3s.", "text-amber-400");
+
+      fetchMetricsOnce();
+      pollingIntervalId = setInterval(fetchMetricsOnce, 3000);
+    }
+
+    function stopPolling() {
+      if (pollingIntervalId) {
+        clearInterval(pollingIntervalId);
+        pollingIntervalId = null;
+      }
+    }
+
+    async function fetchMetricsOnce() {
+      const startTime = performance.now();
+      try {
+        const response = await fetch("/api/v1/metrics");
+        if (response.ok) {
+          const json = await response.json();
+          applyTelemetry(json);
+          const roundTrip = Math.round(performance.now() - startTime);
+          updatePing(roundTrip);
+        } else {
+          fallbackToSimulation();
+        }
+      } catch (err) {
+        fallbackToSimulation();
+      }
+    }
+
+    function fallbackToSimulation() {
+      updateConnectionStatus("offline");
+      simulateJitter();
+    }
+
+    // Measure live gateway ping
+    async function measurePing() {
+      if (!window.location.protocol.startsWith("http")) {
+        updatePing(Math.floor(13 + Math.random() * 4));
+        return;
+      }
+      const t0 = performance.now();
+      try {
+        const resp = await fetch("/api/v1/health");
+        if (resp.ok) {
+          const latency = Math.round(performance.now() - t0);
+          updatePing(latency);
+        }
+      } catch (e) {
+        updatePing(Math.floor(13 + Math.random() * 4));
+      }
+    }
+    setInterval(measurePing, 10000);
+
+    function updatePing(ms) {
+      lastPingMs = ms;
+      const pingDisplay = document.getElementById("pingDisplay");
+      const pingBadge = document.getElementById("pingBadge");
+      if (pingDisplay) pingDisplay.innerText = `${ms}ms`;
+      if (pingBadge) {
+        if (ms < 30) {
+          pingBadge.innerText = "ULTRA LOW";
+          pingBadge.className = "text-[9px] text-emerald-400 font-bold bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20";
+        } else if (ms < 80) {
+          pingBadge.innerText = "NOMINAL";
+          pingBadge.className = "text-[9px] text-quantum-cyan font-bold bg-quantum-cyan/10 px-1 py-0.2 rounded border border-quantum-cyan/20";
+        } else {
+          pingBadge.innerText = "ELEVATED";
+          pingBadge.className = "text-[9px] text-amber-400 font-bold bg-amber-500/10 px-1 py-0.2 rounded border border-amber-500/20";
+        }
+      }
+    }
+
+    // ----------------------------------------------------
+    // 8. Initial Backend Hydration (Specs, Projects, Team)
+    // ----------------------------------------------------
+    async function hydrateInitialData() {
+      if (!window.location.protocol.startsWith("http")) return;
+
+      // 1. Fetch Specs
+      try {
+        const res = await fetch("/api/v1/specs");
+        if (res.ok) {
+          const body = await res.json();
+          const specs = body.data || body;
+          if (specs.cpu && specs.cpu.model) {
+            const el = document.getElementById("specCpuModel");
+            if (el) el.innerHTML = `${specs.cpu.model}<br><span class="text-slate-400 text-[11px]">@ ${specs.cpu.base_clock || "2.80GHz"} (${specs.cpu.cores_physical || 4} vCPU)</span>`;
+            const sub = document.getElementById("cpuModelSub");
+            if (sub) sub.innerText = `${specs.cpu.model.split("@")[0].trim()} // 4 Cores`;
+          }
+          if (specs.memory && specs.memory.total_physical_ram_gb) {
+            const m = document.getElementById("specRam");
+            if (m) m.innerText = `${specs.memory.total_physical_ram_gb.toFixed(1)} GiB High-Density ECC`;
+            const c = document.getElementById("ramTotalCenter");
+            if (c) c.innerText = `${Math.round(specs.memory.total_physical_ram_gb)} GiB`;
+          }
+          if (specs.network && specs.network.region) {
+            const r = document.getElementById("specRegion");
+            if (r) r.innerText = `${specs.network.region}`;
+          }
+          if (specs.server) {
+            const osEl = document.getElementById("specOsKernel");
+            if (osEl) osEl.innerHTML = `${specs.server.os || "Ubuntu 24.04 LTS"}<br><span class="text-slate-500 text-[10px]">${specs.server.kernel || "Kernel 6.17.0-1022-azure"}</span>`;
+          }
+          if (specs.network && specs.network.public_ip) {
+            const ipEl = document.getElementById("publicIpText");
+            if (ipEl) ipEl.innerText = specs.network.public_ip;
+          }
+        }
+      } catch (e) {
+        console.warn("[Sentinel] Specs fetch fallback to default presets.");
+      }
+
+      // 2. Fetch Projects & Live Subdomains
+      try {
+        const res = await fetch("/api/v1/projects");
+        if (res.ok) {
+          const body = await res.json();
+          const projData = body.data || body;
+          if (Array.isArray(projData.services)) {
+            renderServices(projData.services);
+          }
+          if (Array.isArray(projData.deployed_projects)) {
+            renderDeployedProjects(projData.deployed_projects);
+          } else {
+            renderDeployedProjects(DEFAULT_DEPLOYED_PROJECTS);
+          }
+        } else {
+          renderDeployedProjects(DEFAULT_DEPLOYED_PROJECTS);
+        }
+      } catch (e) {
+        console.warn("[Sentinel] Projects fetch fallback to default presets.");
+        renderDeployedProjects(DEFAULT_DEPLOYED_PROJECTS);
+      }
+
+      // 3. Fetch Team
+      try {
+        const res = await fetch("/api/v1/team");
+        if (res.ok) {
+          const body = await res.json();
+          const teamData = body.data || body;
+          if (Array.isArray(teamData.agents)) {
+            updateTeamRosterStatus(teamData.agents);
+          }
+        }
+      } catch (e) {
+        console.warn("[Sentinel] Team fetch fallback to default presets.");
+      }
+    }
+
+    // ----------------------------------------------------
+    // 8b. Deployed Projects Presets & Dynamic Renderer
+    // ----------------------------------------------------
+    const DEFAULT_DEPLOYED_PROJECTS = [
+      {
+        name: "Yudiaz Sentinel",
+        url: "https://vps.daniandraaa.my.id",
+        subdomain: "vps.daniandraaa.my.id",
+        status: "ONLINE / 200 OK",
+        ssl_status: "TLS 1.3 SECURE",
+        description: "Real-time VPS Telemetry, Hardware Observability & Multi-Agent Command Console.",
+        initials: "YS",
+        color: "cyan",
+        port: "PORT 9229"
+      },
+      {
+        name: "9Router AI Gateway",
+        url: "https://api.daniandraaa.my.id",
+        subdomain: "api.daniandraaa.my.id",
+        status: "ONLINE / 200 OK",
+        ssl_status: "TLS 1.3 SECURE",
+        description: "Unified LLM Inference Proxy, Multi-Provider Fallback & Virtualized API Keys.",
+        initials: "9R",
+        color: "iris",
+        port: "PORT 20128"
+      },
+      {
+        name: "Hermes Agent Engine",
+        url: "https://hermes.20.200.220.190.sslip.io",
+        subdomain: "hermes.20.200.220.190.sslip.io",
+        status: "ONLINE / 200 OK",
+        ssl_status: "TLS 1.3 SECURE",
+        description: "Autonomous Multi-Profile AI Agent Execution Runtime & Bridge Platform.",
+        initials: "HE",
+        color: "emerald",
+        port: "PORT 9119"
+      }
+    ];
+
+    function toggleDaemonsList() {
+      const el = document.getElementById("daemonsCollapsible");
+      const chevron = document.getElementById("daemonsChevron");
+      const btn = document.getElementById("toggleDaemonsBtn");
+      if (!el) return;
+      const isHidden = el.classList.contains("hidden");
+      if (isHidden) {
+        el.classList.remove("hidden");
+        if (chevron) chevron.classList.remove("-rotate-90");
+        if (btn) btn.setAttribute("aria-expanded", "true");
+      } else {
+        el.classList.add("hidden");
+        if (chevron) chevron.classList.add("-rotate-90");
+        if (btn) btn.setAttribute("aria-expanded", "false");
+      }
+    }
+
+    function renderDeployedProjects(projects) {
+      const container = document.getElementById("deployedProjectsList");
+      if (!container) return;
+
+      const items = (Array.isArray(projects) && projects.length > 0) ? projects : DEFAULT_DEPLOYED_PROJECTS;
+      let onlineCount = 0;
+      let html = "";
+
+      items.forEach(proj => {
+        const name = proj.name || proj.title || "Project";
+        const rawUrl = proj.url || proj.live_url || (proj.subdomain ? ("https://" + proj.subdomain) : "#");
+        const ssl = proj.ssl_status || proj.ssl || proj.tls || "TLS 1.3 SECURE";
+        const desc = proj.description || proj.desc || proj.details || "";
+        const rawStatus = (proj.status || proj.status_text || (proj.status_code ? (proj.status_code + " OK") : "ONLINE")).toUpperCase();
+
+        let statusText = rawStatus;
+        if (statusText === "ONLINE" || statusText === "ACTIVE") {
+          statusText = "ONLINE / 200 OK";
+        }
+        const isOnline = !statusText.includes("OFFLINE") && !statusText.includes("ERROR") && !statusText.includes("503");
+        if (isOnline) onlineCount++;
+
+        const pingClass = isOnline ? "bg-emerald-400" : "bg-rose-500";
+        const dotClass = isOnline ? "bg-emerald-500" : "bg-rose-500";
+        const textStatusClass = isOnline ? "text-emerald-400" : "text-rose-400";
+        const borderStatusClass = isOnline ? "border-emerald-500/30 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.15)]" : "border-rose-500/30 bg-rose-500/10";
+
+        let initials = proj.initials;
+        if (!initials) {
+          initials = name.split(" ").map(w => w[0]).filter(Boolean).join("").substring(0, 2).toUpperCase();
+        }
+
+        let badgeStyle = "bg-quantum-cyan/15 border-quantum-cyan/40 text-quantum-cyan shadow-[0_0_12px_rgba(0,242,254,0.25)]";
+        let hoverBorder = "hover:border-quantum-cyan/50";
+        if (proj.color === "iris" || name.includes("9Router")) {
+          badgeStyle = "bg-cyber-iris/15 border-cyber-iris/40 text-cyber-iris shadow-[0_0_12px_rgba(99,102,241,0.25)]";
+          hoverBorder = "hover:border-cyber-iris/50";
+        } else if (proj.color === "emerald" || name.includes("Hermes")) {
+          badgeStyle = "bg-emerald-500/15 border-emerald-500/40 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.25)]";
+          hoverBorder = "hover:border-emerald-500/50";
+        }
+
+        const portBadge = proj.port ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">${proj.port}</span>` : "";
+
+        // Safe escaped strings for JS onclick
+        const escapedUrl = rawUrl.replace(/'/g, "\\'");
+        const escapedName = name.replace(/'/g, "\\'");
+
+        html += `
+          <article class="glass-card rounded-xl p-4 border border-obsidian-border relative group ${hoverBorder} transition-all duration-300">
+            <div class="flex items-start justify-between gap-3 mb-2.5">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-lg ${badgeStyle} border flex items-center justify-center font-mono text-xs font-bold shrink-0 group-hover:scale-105 transition-transform">
+                  ${initials}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h4 class="text-xs sm:text-sm font-bold text-platinum font-mono truncate">${name}</h4>
+                    ${portBadge}
+                    <span class="inline-flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                      <svg class="w-2.5 h-2.5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v2H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1V6a4 4 0 00-4-4zm2 6V6a2 2 0 10-4 0v2h4z" clip-rule="evenodd"/></svg>
+                      ${ssl}
+                    </span>
+                  </div>
+                  <a href="${rawUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-mono text-quantum-cyan hover:text-white hover:underline mt-0.5 truncate max-w-full group/link rounded" title="Open ${rawUrl}">
+                    <span class="truncate">${rawUrl}</span>
+                    <svg class="w-3 h-3 shrink-0 opacity-70 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  </a>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1.5 px-2 py-1 rounded border ${borderStatusClass} shrink-0">
+                <span class="relative flex h-2 w-2" aria-hidden="true">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full ${pingClass} opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 ${dotClass}"></span>
+                </span>
+                <span class="text-[9px] sm:text-[10px] font-mono font-bold ${textStatusClass} tracking-wide whitespace-nowrap">${statusText}</span>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-300 leading-relaxed mb-3 font-sans line-clamp-2">
+              ${desc}
+            </p>
+
+            <div class="flex items-center gap-2 pt-2.5 border-t border-obsidian-border/60">
+              <a href="${rawUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-cyber-iris hover:bg-indigo-600 text-white font-mono text-xs font-semibold shadow-[0_0_12px_rgba(99,102,241,0.35)] hover:shadow-[0_0_18px_rgba(99,102,241,0.6)] active:scale-[0.98] transition-all" title="Launch ${name} in new tab">
+                <span>Open Project</span>
+                <span class="text-xs font-bold">↗</span>
+              </a>
+              <button onclick="copyToClipboard('${escapedUrl}', '${escapedName} URL (${escapedUrl}) Copied!')" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-obsidian-elevated hover:bg-obsidian-hover border border-obsidian-border hover:border-slate-500 text-slate-300 hover:text-white font-mono text-xs active:scale-[0.98] transition-all" title="Copy URL: ${rawUrl}" aria-label="Copy URL for ${name}">
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <span>Copy URL</span>
+              </button>
+            </div>
+          </article>
+        `;
+      });
+
+      container.innerHTML = html;
+      const countBadge = document.getElementById("activeDeployedProjectsBadge");
+      if (countBadge) countBadge.innerText = `${onlineCount} ONLINE`;
+    }
+
+    function renderServices(services) {
+      const container = document.getElementById("servicesList");
+      if (!container || !services || services.length === 0) return;
+
+      let runningCount = 0;
+      let html = "";
+
+      services.forEach(svc => {
+        const isOnline = svc.status === "online" || svc.status === "active" || svc.status === "healthy" || svc.status === "synced";
+        if (isOnline) runningCount++;
+
+        let badgeText = svc.status ? svc.status.toUpperCase() : "ONLINE";
+        let badgeClass = "text-emerald-400";
+        let pingColor = "bg-emerald-500";
+
+        if (svc.status === "synced") {
+          badgeClass = "text-purple-400";
+          pingColor = "bg-purple-400";
+        } else if (svc.status === "degraded" || svc.status === "warning") {
+          badgeClass = "text-amber-400";
+          pingColor = "bg-amber-400";
+        }
+
+        const portBadge = svc.port ? `PORT ${svc.port}` : (svc.runtime_type ? svc.runtime_type.toUpperCase() : "CORE");
+        const shortInitials = svc.name.split(" ").map(w => w[0]).join("").substring(0, 2).toUpperCase();
+
+        html += `
+          <div class="glass-card rounded-lg p-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-cyber-iris/15 border border-cyber-iris/30 flex items-center justify-center text-cyber-iris font-mono text-xs font-bold shadow-[0_0_10px_rgba(99,102,241,0.2)]">
+                ${shortInitials}
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="text-xs font-bold text-platinum font-mono">${svc.name}</h4>
+                  <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-obsidian-elevated text-slate-400 border border-obsidian-border">${portBadge}</span>
+                </div>
+                <p class="text-[11px] text-slate-400">${svc.details || svc.category || ""}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="relative flex h-2 w-2" aria-hidden="true">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full ${pingColor} opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 ${pingColor}"></span>
+              </span>
+              <span class="text-[10px] font-mono font-bold ${badgeClass}">${badgeText}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      const countBadge = document.getElementById("activeProjectsCountBadge");
+      if (countBadge) countBadge.innerText = `${runningCount} RUNNING`;
+    }
+
+    function updateTeamRosterStatus(agents) {
+      agents.forEach(a => {
+        const cardKey = a.id ? a.id.replace("-hendrix", "").replace("-ashford", "").replace("-vasquez", "").replace("-louviere", "").replace("-nakamura", "").replace("-stellan", "").replace("-moreau", "").replace("-sinclair", "").replace("-aritza", "") : "";
+        if (agentDatabase[cardKey]) {
+          agentDatabase[cardKey].status = a.status ? a.status.toUpperCase() : agentDatabase[cardKey].status;
+          if (a.specialization) agentDatabase[cardKey].soul = a.specialization;
+        }
+      });
+    }
+
+    // ----------------------------------------------------
+    // 9. Simulation Engine (For offline demo / instant response)
+    // ----------------------------------------------------
+    function simulateJitter() {
+      if (sseActive) return;
+
+      const baseCpu = 24.8;
+      const jitter = (Math.random() * 4 - 2).toFixed(1);
+      const currentCpu = Math.max(15, Math.min(48, (parseFloat(baseCpu) + parseFloat(jitter)).toFixed(1)));
+      const cpuElem = document.getElementById("cpuTotalUsage");
+      if (cpuElem) cpuElem.innerText = `${currentCpu}%`;
+
+      sparklineHistory.push(parseFloat(currentCpu));
+      if (sparklineHistory.length > 60) sparklineHistory.shift();
+      renderSparkline(sparklineHistory);
+
+      const c0 = Math.floor(30 + Math.random() * 15);
+      const c1 = Math.floor(18 + Math.random() * 10);
+      const c2 = Math.floor(22 + Math.random() * 14);
+      const c3 = Math.floor(10 + Math.random() * 8);
+
+      const updateCore = (i, val) => {
+        const bar = document.getElementById(`core${i}Bar`);
+        const lbl = document.getElementById(`core${i}Val`);
+        if (bar) bar.style.width = `${val}%`;
+        if (lbl) lbl.innerText = `${val}%`;
+      };
+      updateCore(0, c0);
+      updateCore(1, c1);
+      updateCore(2, c2);
+      updateCore(3, c3);
+
+      const ping = Math.floor(13 + Math.random() * 4);
+      updatePing(ping);
+
+      const rSpeed = (3.8 + Math.random() * 1.2).toFixed(1);
+      const wSpeed = (1.4 + Math.random() * 0.9).toFixed(1);
+      const iops = Math.floor(400 + Math.random() * 60);
+      const r = document.getElementById("diskReadVal");
+      const w = document.getElementById("diskWriteVal");
+      const io = document.getElementById("diskIopsVal");
+      if (r) r.innerText = `${rSpeed} MB/s`;
+      if (w) w.innerText = `${wSpeed} MB/s`;
+      if (io) io.innerText = `${iops} req/s`;
+    }
+
+    function startTelemetrySimulation() {
+      setInterval(simulateJitter, 3000);
+    }
+
+    // ----------------------------------------------------
+    // 10. Department Filter & Interactive Tabs
+    // ----------------------------------------------------
+    function filterAgents(type) {
+      const cards = document.querySelectorAll(".agent-card");
+      const btnAll = document.getElementById("filterAll");
+      const btnDev = document.getElementById("filterDev");
+      const btnSup = document.getElementById("filterSupport");
+
+      [btnAll, btnDev, btnSup].forEach(btn => {
+        if (btn) {
+          btn.className = "px-2.5 py-1 rounded text-slate-400 hover:text-white transition-all";
+          btn.setAttribute("aria-selected", "false");
+        }
+      });
+
+      if (type === "all") {
+        if (btnAll) {
+          btnAll.className = "px-2.5 py-1 rounded bg-cyber-iris text-white font-semibold transition-all";
+          btnAll.setAttribute("aria-selected", "true");
+        }
+        cards.forEach(card => card.classList.remove("hidden"));
+      } else if (type === "dev") {
+        if (btnDev) {
+          btnDev.className = "px-2.5 py-1 rounded bg-cyber-iris text-white font-semibold transition-all";
+          btnDev.setAttribute("aria-selected", "true");
+        }
+        cards.forEach(card => {
+          if (card.dataset.dept === "dev") {
+            card.classList.remove("hidden");
+          } else {
+            card.classList.add("hidden");
+          }
+        });
+      } else if (type === "support") {
+        if (btnSup) {
+          btnSup.className = "px-2.5 py-1 rounded bg-cyber-iris text-white font-semibold transition-all";
+          btnSup.setAttribute("aria-selected", "true");
+        }
+        cards.forEach(card => {
+          if (card.dataset.dept === "support") {
+            card.classList.remove("hidden");
+          } else {
+            card.classList.add("hidden");
+          }
+        });
+      }
+    }
+
+    // ----------------------------------------------------
+    // 11. Agent Inspection Modal / Drawer
+    // ----------------------------------------------------
+    function inspectAgent(id) {
+      const agent = agentDatabase[id];
+      if (!agent) return;
+
+      const nameEl = document.getElementById("modalAgentName");
+      const roleEl = document.getElementById("modalAgentRole");
+      const statEl = document.getElementById("modalAgentStatus");
+      const soulEl = document.getElementById("modalAgentSoul");
+      const deptEl = document.getElementById("modalAgentDept");
+      const brgEl = document.getElementById("modalAgentBridge");
+      const qteEl = document.getElementById("modalAgentQuote");
+      const badgeElem = document.getElementById("modalAgentBadge");
+
+      if (nameEl) nameEl.innerText = agent.name;
+      if (roleEl) roleEl.innerText = agent.role;
+      if (statEl) statEl.innerText = agent.status;
+      if (soulEl) soulEl.innerText = agent.soul;
+      if (deptEl) deptEl.innerText = agent.dept;
+      if (brgEl) brgEl.innerText = agent.bridge || "Hermes Subagent";
+      if (qteEl) qteEl.innerText = `"${agent.quote}"`;
+
+      if (badgeElem) {
+        badgeElem.innerText = agent.badge;
+        badgeElem.className = `w-14 h-14 rounded-xl bg-obsidian-panel border ${agent.border} flex items-center justify-center ${agent.color} font-mono font-bold text-xl shadow-lg`;
+      }
+
+      const modal = document.getElementById("agentModal");
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    }
+
+    function closeAgentModal() {
+      const modal = document.getElementById("agentModal");
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+    }
+
+    // ----------------------------------------------------
+    // 12. CLI Logs Modal & Terminal Buffer
+    // ----------------------------------------------------
+    function openSystemLogsModal() {
+      const modal = document.getElementById("logsModal");
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    }
+
+    function closeSystemLogsModal() {
+      const modal = document.getElementById("logsModal");
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+    }
+
+    function clearLogs() {
+      const term = document.getElementById("terminalLogs");
+      if (term) {
+        term.innerHTML = "<div class=\"text-slate-500\">[BUFFER CLEARED] Telemetry buffer flushed. Listening for active events...</div>";
+      }
+    }
+
+    function appendTerminalLog(message, colorClass = "text-slate-300") {
+      const term = document.getElementById("terminalLogs");
+      if (!term) return;
+      const line = document.createElement("div");
+      line.className = colorClass;
+      line.innerText = message;
+      term.appendChild(line);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    // ----------------------------------------------------
+    // 13. Timezone Switcher
+    // ----------------------------------------------------
+    const timezones = [
+      { label: "WIB (UTC+7)", code: "Asia/Jakarta" },
+      { label: "KST (UTC+9)", code: "Asia/Seoul" },
+      { label: "UTC (GMT)", code: "UTC" }
+    ];
+    let currentTzIdx = 0;
+    function toggleTimezone() {
+      currentTzIdx = (currentTzIdx + 1) % timezones.length;
+      const label = document.getElementById("tzLabel");
+      if (label) label.innerText = timezones[currentTzIdx].label;
+      showToast(`Timezone switched to ${timezones[currentTzIdx].label}`);
+    }
+
+    // ----------------------------------------------------
+    // 14. Manual Refresh Action
+    // ----------------------------------------------------
+    function manualRefresh() {
+      const icon = document.getElementById("refreshIcon");
+      if (icon) icon.classList.add("animate-spin");
+
+      if (window.location.protocol.startsWith("http")) {
+        Promise.allSettled([fetchMetricsOnce(), hydrateInitialData()]).finally(() => {
+          setTimeout(() => {
+            if (icon) icon.classList.remove("animate-spin");
+            showToast("Telemetry & deployed projects refreshed from Azure Host.");
+          }, 600);
+        });
+      } else {
+        simulateJitter();
+        setTimeout(() => {
+          if (icon) icon.classList.remove("animate-spin");
+          showToast("Telemetry metrics synchronized (Simulation).");
+        }, 600);
+      }
+    }
+
+    // ----------------------------------------------------
+    // 15. Copy to Clipboard with Feedback Toast
+    // ----------------------------------------------------
+    function copyToClipboard(text, message) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(message || "Copied to clipboard!");
+        }).catch(() => {
+          showToast("Copied: " + text);
+        });
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand("copy");
+          showToast(message || "Copied to clipboard!");
+        } catch (e) {
+          showToast("Copied: " + text);
+        }
+        document.body.removeChild(textarea);
+      }
+    }
+
+    // ----------------------------------------------------
+    // 16. Elegant Toast Notifications
+    // ----------------------------------------------------
+    function showToast(message) {
+      const container = document.getElementById("toastContainer");
+      if (!container) return;
+      const toast = document.createElement("div");
+      toast.className = "flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-obsidian-panel border border-cyber-iris/40 shadow-2xl text-xs font-mono text-platinum transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto";
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-quantum-cyan shadow-[0_0_8px_#00F2FE]" aria-hidden="true"></span>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove("translate-y-2", "opacity-0");
+      });
+
+      setTimeout(() => {
+        toast.classList.add("opacity-0", "-translate-y-2");
+        setTimeout(() => toast.remove(), 320);
+      }, 3000);
+    }
+
+    // ----------------------------------------------------
+    // 17. Keyboard Accessibility & Lifecycle Bootstrap
+    // ----------------------------------------------------
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeAgentModal();
+        closeSystemLogsModal();
+      }
+    });
+
+    window.addEventListener("click", (e) => {
+      const agentModal = document.getElementById("agentModal");
+      const logsModal = document.getElementById("logsModal");
+      if (e.target === agentModal) closeAgentModal();
+      if (e.target === logsModal) closeSystemLogsModal();
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderSparkline(sparklineHistory);
+      hydrateInitialData();
+      initEventSource();
+    });
+  </script>
+</body>
+</html>
