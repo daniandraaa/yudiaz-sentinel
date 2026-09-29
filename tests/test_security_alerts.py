@@ -529,3 +529,33 @@ def test_post_security_digest_trigger_error_handling(client: TestClient) -> None
         assert payload["success"] is False
         assert payload["error"]["code"] == "DIGEST_TRIGGER_ERROR"
 
+
+@pytest.mark.asyncio
+async def test_send_security_alert_routes_to_ceo_private_chat() -> None:
+    """Verify security intrusion alerts are routed to CEO private chat instead of the group."""
+    with patch("backend.notifier.send_telegram_message", new_callable=AsyncMock) as mock_send:
+        mock_send.return_value = True
+
+        with patch.dict(
+            os.environ,
+            {
+                "TELEGRAM_CHAT_ID": "-5549212752",
+                "TELEGRAM_CEO_CHAT_ID": "1062533303",
+                "TELEGRAM_SECURITY_CHAT_ID": "1062533303",
+            },
+        ):
+            success = await notifier.send_security_alert(
+                ip="45.148.10.157",
+                jail="sshd",
+                action="Ban",
+                recidive_info="Strike #2 (Repeat Offender)",
+                force=True,
+            )
+            assert success is True
+            assert mock_send.call_count == 1
+            # Check chat_id argument
+            call_kwargs = mock_send.call_args.kwargs
+            assert call_kwargs.get("chat_id") == "1062533303"
+            assert call_kwargs.get("chat_id") != "-5549212752"
+
+

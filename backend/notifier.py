@@ -77,12 +77,32 @@ deduplicator = AlertDeduplicator(default_cooldown_seconds=300.0)
 
 
 def _get_credentials() -> tuple[str, str]:
-    """Retrieve Telegram bot token and default target chat ID."""
+    """Retrieve Telegram bot token and default target chat ID.
+
+    Security alerts and sensitive telemetry are strictly confidential:
+    Default target chat ID is set to CEO private chat.
+    """
     token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
     chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
     if not chat_id:
         chat_id = os.getenv("TELEGRAM_CEO_CHAT_ID", "").strip()
     return token, chat_id
+
+
+def _get_security_chat_id() -> str:
+    """Retrieve target chat ID for security alerts.
+
+    Security intrusion alerts and fail2ban notifications are routed exclusively
+    to the CEO private chat (TELEGRAM_SECURITY_CHAT_ID or TELEGRAM_CEO_CHAT_ID)
+    rather than public or studio group channels.
+    """
+    sec_chat = os.getenv("TELEGRAM_SECURITY_CHAT_ID", "").strip()
+    if sec_chat:
+        return sec_chat
+    ceo_chat = os.getenv("TELEGRAM_CEO_CHAT_ID", "").strip()
+    if ceo_chat:
+        return ceo_chat
+    return os.getenv("TELEGRAM_CHAT_ID", "").strip()
 
 
 def _current_iso_time() -> str:
@@ -202,7 +222,8 @@ async def send_security_alert(
         "\n<i>Yudiaz Creative Studio VPS Defense System</i>"
     )
 
-    success = await send_telegram_message(message, chat_id=chat_id)
+    target_chat = str(chat_id).strip() if chat_id else _get_security_chat_id()
+    success = await send_telegram_message(message, chat_id=target_chat)
     if success:
         deduplicator.record_alert(cache_key)
     return success
