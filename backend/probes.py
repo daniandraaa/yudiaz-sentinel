@@ -136,6 +136,7 @@ async def probe_all_services() -> Dict[str, Any]:
         probe_tcp_socket("127.0.0.1", 443),  # Caddy (443)
         probe_tcp_socket("127.0.0.1", 80),  # Caddy (80)
         probe_docker_daemon(),  # Docker
+        probe_http_service("127.0.0.1", 9559),  # Yudiaz LaTeX Studio
         return_exceptions=True,
     )
 
@@ -169,7 +170,13 @@ async def probe_all_services() -> Dict[str, Any]:
     repo_ok = os.path.exists(repo_path) and os.access(repo_path, os.R_OK)
     assets_status = "healthy" if repo_ok else "unhealthy"
 
-    # 6. Docker daemon
+    # 6. Yudiaz LaTeX Studio
+    latex_res = results[5] if len(results) > 5 and not isinstance(results[5], Exception) else (False, None)
+    latex_ok, latex_code = latex_res
+    latex_status = "online" if latex_ok else "offline"
+    latex_status_code = latex_code if latex_ok else 503
+
+    # 7. Docker daemon
     docker_data = results[4] if isinstance(results[4], dict) else {
         "status": "offline",
         "containers_running": 0,
@@ -233,12 +240,24 @@ async def probe_all_services() -> Dict[str, Any]:
             "details": f"{repo_path} local workspace repository",
             "last_checked": now_iso,
         },
+        {
+            "id": "yudiaz-latex",
+            "name": "Yudiaz LaTeX Studio",
+            "category": "Cloud Document Workspace",
+            "port": 9559,
+            "status": latex_status,
+            "status_code": latex_status_code,
+            "runtime_type": "Systemd Service (yudiaz-latex.service)",
+            "details": "Enterprise Cloud LaTeX Workspace and Realtime Compiler",
+            "last_checked": now_iso,
+        },
     ]
 
     deployed_projects = get_deployed_projects(
         sentinel_status=sentinel_status,
         router_status=router_status,
         hermes_status=hermes_status,
+        latex_status=latex_status,
     )
 
     return {
@@ -254,6 +273,7 @@ def get_deployed_projects(
     hermes_status: str = "online",
     finance_status: str = "online",
     office_status: str = "online",
+    latex_status: str = "online",
 ) -> List[Dict[str, Any]]:
     """Return catalog of deployed production projects with live operational status."""
     return [
@@ -317,22 +337,36 @@ def get_deployed_projects(
             "badge": "CORE PLATFORM",
             "internal_port": 9119,
         },
+        {
+            "id": "yudiaz-latex",
+            "name": "Yudiaz LaTeX Studio",
+            "domain": "latex.daniandraaa.my.id",
+            "url": "https://latex.daniandraaa.my.id",
+            "category": "Cloud Document Workspace",
+            "description": "Enterprise Cloud LaTeX Workspace, academic document engine, and real-time PDF compiler.",
+            "status": latex_status,
+            "ssl": "TLS 1.3 Active",
+            "badge": "LIVE PRODUCTION",
+            "internal_port": 9559,
+        },
     ]
 
 
 async def probe_deployed_projects() -> List[Dict[str, Any]]:
     """Probe network status for all deployed production projects independently."""
-    hermes_res, router_res, finance_res, office_res = await asyncio.gather(
+    hermes_res, router_res, finance_res, office_res, latex_res = await asyncio.gather(
         probe_http_service("127.0.0.1", 9119),
         probe_http_service("127.0.0.1", 20128),
         probe_http_service("127.0.0.1", 9339),
         probe_http_service("127.0.0.1", 9449),
+        probe_http_service("127.0.0.1", 9559),
         return_exceptions=True,
     )
     hermes_ok = hermes_res[0] if (isinstance(hermes_res, tuple) and len(hermes_res) >= 1) else False
     router_ok = router_res[0] if (isinstance(router_res, tuple) and len(router_res) >= 1) else False
     finance_ok = finance_res[0] if (isinstance(finance_res, tuple) and len(finance_res) >= 1) else False
     office_ok = office_res[0] if (isinstance(office_res, tuple) and len(office_res) >= 1) else False
+    latex_ok = latex_res[0] if (isinstance(latex_res, tuple) and len(latex_res) >= 1) else False
 
     return get_deployed_projects(
         sentinel_status="online",
@@ -340,4 +374,5 @@ async def probe_deployed_projects() -> List[Dict[str, Any]]:
         hermes_status="online" if hermes_ok else "offline",
         finance_status="online" if finance_ok else "offline",
         office_status="online" if office_ok else "offline",
+        latex_status="online" if latex_ok else "offline",
     )

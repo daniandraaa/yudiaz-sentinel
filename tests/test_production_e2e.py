@@ -176,9 +176,9 @@ def test_primary_projects_payload():
         assert r.status_code == 200
         body = r.json()["data"]
         services = body["services"]
-        assert len(services) == 5
+        assert len(services) == 6
         service_map = {s["id"]: s for s in services}
-        for expected in ["hermes-agent", "9router", "caddy", "yudiaz-sentinel", "yudiaz-assets"]:
+        for expected in ["hermes-agent", "9router", "caddy", "yudiaz-sentinel", "yudiaz-assets", "yudiaz-latex"]:
             assert expected in service_map
             assert service_map[expected]["status"] in ("online", "healthy")
 
@@ -188,10 +188,10 @@ def test_primary_team_payload():
         r = client.get(f"{PRIMARY_URL}/api/v1/team")
         assert r.status_code == 200
         body = r.json()["data"]
-        assert body["total_agents"] == 9
+        assert body["total_agents"] == 11
         agents = {a["id"]: a for a in body["agents"]}
         expected_agents = [
-            "raziel-hendrix", "kael-ashford", "nara-vasquez",
+            "daffa", "cucurella", "raziel-hendrix", "kael-ashford", "nara-vasquez",
             "senna-louviere", "idris-nakamura", "mika-stellan",
             "viktor-moreau", "elara-sinclair", "jovan-aritza"
         ]

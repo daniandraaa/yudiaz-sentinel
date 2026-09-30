@@ -126,6 +126,7 @@ def test_projects_endpoint(client: TestClient) -> None:
     assert "caddy" in service_ids
     assert "yudiaz-sentinel" in service_ids
     assert "yudiaz-assets" in service_ids
+    assert "yudiaz-latex" in service_ids
 
     # Verify Docker daemon inspect
     assert "docker" in data
@@ -214,7 +215,7 @@ def test_team_endpoint(client: TestClient) -> None:
 
     data = payload["data"]
     assert data["organization"] == "Yudiaz Creative Studio"
-    assert data["total_agents"] == 9
+    assert data["total_agents"] == 11
 
     agents = data["agents"]
     assert len(agents) == 9

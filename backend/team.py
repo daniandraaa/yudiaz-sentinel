@@ -11,6 +11,16 @@ from typing import Any, Dict, List
 # Roster of 9 Autonomous AI Agents operating across Yudiaz Creative Studio
 AI_AGENTS_ROSTER: List[Dict[str, Any]] = [
     {
+        "id": "daffa",
+        "name": "Daffa",
+        "role": "Head of CEO Office & Chief of Staff",
+        "department": "Executive Leadership",
+        "status": "active",
+        "avatar_badge": "COS",
+        "specialization": "Executive oversight, cross-division unblocking, strategic alignment",
+        "description": "Pengawasan operasional studio, tangan kanan CEO, penyelarasan lintas divisi",
+    },
+    {
         "id": "raziel-hendrix",
         "name": "Raziel Hendrix",
         "role": "CTO & Orchestrator",
@@ -99,6 +109,16 @@ AI_AGENTS_ROSTER: List[Dict[str, Any]] = [
         "avatar_badge": "INTEL",
         "specialization": "Telkom University intelligence, academic network monitoring",
         "description": "Telkom University intelligence, academic network monitoring",
+    },
+    {
+        "id": "cucurella",
+        "name": "Cucurella",
+        "role": "Head of Soetahills Growth",
+        "department": "Real Estate & Strategic Growth",
+        "status": "active",
+        "avatar_badge": "GROWTH",
+        "specialization": "Real estate market intel, content planning, Soetahills property growth",
+        "description": "Market intelligence properti, strategi pertumbuhan unit Soetahills, konten visual",
     },
 ]
 
