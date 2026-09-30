@@ -386,7 +386,7 @@ def get_deployed_projects(
 
 async def probe_deployed_projects() -> List[Dict[str, Any]]:
     """Probe network status for all deployed production projects independently."""
-    hermes_res, router_res, finance_res, office_res, latex_res = await asyncio.gather(
+    hermes_res, router_res, finance_res, office_res, latex_res, npp_res = await asyncio.gather(
         probe_http_service("127.0.0.1", 9119),
         probe_http_service("127.0.0.1", 20128),
         probe_http_service("127.0.0.1", 9339),
@@ -400,7 +400,6 @@ async def probe_deployed_projects() -> List[Dict[str, Any]]:
     finance_ok = finance_res[0] if (isinstance(finance_res, tuple) and len(finance_res) >= 1) else False
     office_ok = office_res[0] if (isinstance(office_res, tuple) and len(office_res) >= 1) else False
     latex_ok = latex_res[0] if (isinstance(latex_res, tuple) and len(latex_res) >= 1) else False
-    npp_res = results[5] if len(results) > 5 and not isinstance(results[5], Exception) else (False, None)
     npp_ok = npp_res[0] if (isinstance(npp_res, tuple) and len(npp_res) >= 1) else False
 
     return get_deployed_projects(
