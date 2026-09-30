@@ -218,7 +218,7 @@ def test_team_endpoint(client: TestClient) -> None:
     assert data["total_agents"] == 11
 
     agents = data["agents"]
-    assert len(agents) == 9
+    assert len(agents) == 11
     agent_ids = [a["id"] for a in agents]
 
     required_agents = [
