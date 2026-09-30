@@ -120,6 +120,16 @@ AI_AGENTS_ROSTER: List[Dict[str, Any]] = [
         "specialization": "Real estate market intel, content planning, Soetahills property growth",
         "description": "Market intelligence properti, strategi pertumbuhan unit Soetahills, konten visual",
     },
+    {
+        "id": "devera",
+        "name": "Devera",
+        "role": "CTO & Accountant",
+        "department": "Gold Capital & Finance Ops",
+        "status": "active",
+        "avatar_badge": "ACCT",
+        "specialization": "Precious metals capital reconciliation, zero-discrepancy ledger, NPP platform",
+        "description": "CTO & Lead Accountant platform No Pusing Pusing untuk Bang Fauzan & Konsorsium Emas",
+    },
 ]
 
 

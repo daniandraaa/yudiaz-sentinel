@@ -137,6 +137,7 @@ async def probe_all_services() -> Dict[str, Any]:
         probe_tcp_socket("127.0.0.1", 80),  # Caddy (80)
         probe_docker_daemon(),  # Docker
         probe_http_service("127.0.0.1", 9559),  # Yudiaz LaTeX Studio
+        probe_http_service("127.0.0.1", 9669),  # No Pusing Pusing (NPP)
         return_exceptions=True,
     )
 
@@ -176,7 +177,13 @@ async def probe_all_services() -> Dict[str, Any]:
     latex_status = "online" if latex_ok else "offline"
     latex_status_code = latex_code if latex_ok else 503
 
-    # 7. Docker daemon
+    # 7. No Pusing Pusing (NPP)
+    npp_res = results[6] if len(results) > 6 and not isinstance(results[6], Exception) else (False, None)
+    npp_ok, npp_code = npp_res
+    npp_status = "online" if npp_ok else "offline"
+    npp_status_code = npp_code if npp_ok else 503
+
+    # 8. Docker daemon
     docker_data = results[4] if isinstance(results[4], dict) else {
         "status": "offline",
         "containers_running": 0,
@@ -251,6 +258,17 @@ async def probe_all_services() -> Dict[str, Any]:
             "details": "Enterprise Cloud LaTeX Workspace and Realtime Compiler",
             "last_checked": now_iso,
         },
+        {
+            "id": "yudiaz-npp",
+            "name": "No Pusing Pusing (NPP)",
+            "category": "Gold Capital Reconciliation",
+            "port": 9669,
+            "status": npp_status,
+            "status_code": npp_status_code,
+            "runtime_type": "Systemd Service (yudiaz-npp.service)",
+            "details": "Dedicated Gold Trading Capital Reconciliation Engine for Bang Fauzan",
+            "last_checked": now_iso,
+        },
     ]
 
     deployed_projects = get_deployed_projects(
@@ -258,6 +276,7 @@ async def probe_all_services() -> Dict[str, Any]:
         router_status=router_status,
         hermes_status=hermes_status,
         latex_status=latex_status,
+        npp_status=npp_status,
     )
 
     return {
@@ -274,6 +293,7 @@ def get_deployed_projects(
     finance_status: str = "online",
     office_status: str = "online",
     latex_status: str = "online",
+    npp_status: str = "online",
 ) -> List[Dict[str, Any]]:
     """Return catalog of deployed production projects with live operational status."""
     return [
@@ -349,6 +369,18 @@ def get_deployed_projects(
             "badge": "LIVE PRODUCTION",
             "internal_port": 9559,
         },
+        {
+            "id": "yudiaz-npp",
+            "name": "No Pusing Pusing (NPP)",
+            "domain": "npp.daniandraaa.my.id",
+            "url": "https://npp.daniandraaa.my.id",
+            "category": "Gold Capital Reconciliation",
+            "description": "Dedicated Gold Trading Capital Reconciliation Engine for Bang Fauzan & Consortium 7.",
+            "status": npp_status,
+            "ssl": "TLS 1.3 Active",
+            "badge": "NEW DEPLOYMENT",
+            "internal_port": 9669,
+        },
     ]
 
 
@@ -360,6 +392,7 @@ async def probe_deployed_projects() -> List[Dict[str, Any]]:
         probe_http_service("127.0.0.1", 9339),
         probe_http_service("127.0.0.1", 9449),
         probe_http_service("127.0.0.1", 9559),
+        probe_http_service("127.0.0.1", 9669),
         return_exceptions=True,
     )
     hermes_ok = hermes_res[0] if (isinstance(hermes_res, tuple) and len(hermes_res) >= 1) else False
@@ -367,6 +400,8 @@ async def probe_deployed_projects() -> List[Dict[str, Any]]:
     finance_ok = finance_res[0] if (isinstance(finance_res, tuple) and len(finance_res) >= 1) else False
     office_ok = office_res[0] if (isinstance(office_res, tuple) and len(office_res) >= 1) else False
     latex_ok = latex_res[0] if (isinstance(latex_res, tuple) and len(latex_res) >= 1) else False
+    npp_res = results[5] if len(results) > 5 and not isinstance(results[5], Exception) else (False, None)
+    npp_ok = npp_res[0] if (isinstance(npp_res, tuple) and len(npp_res) >= 1) else False
 
     return get_deployed_projects(
         sentinel_status="online",
@@ -375,4 +410,5 @@ async def probe_deployed_projects() -> List[Dict[str, Any]]:
         finance_status="online" if finance_ok else "offline",
         office_status="online" if office_ok else "offline",
         latex_status="online" if latex_ok else "offline",
+        npp_status="online" if npp_ok else "offline",
     )
