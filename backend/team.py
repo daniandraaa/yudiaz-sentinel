@@ -130,6 +130,16 @@ AI_AGENTS_ROSTER: List[Dict[str, Any]] = [
         "specialization": "Precious metals capital reconciliation, zero-discrepancy ledger, NPP platform",
         "description": "CTO & Lead Accountant platform No Pusing Pusing untuk Bang Fauzan & Konsorsium Emas",
     },
+    {
+        "id": "orca",
+        "name": "Orca",
+        "role": "LaTeX Editor & Academic Partner",
+        "department": "Academic Publishing & Thesis Support",
+        "status": "active",
+        "avatar_badge": "TEX",
+        "specialization": "LaTeX typesetting, Overleaf/TeX Live troubleshooting, academic proposal drafting",
+        "description": "LaTeX Editor handal & mitra penulisan Proposal Tugas Akhir khusus untuk Dimas",
+    },
 ]
 
 

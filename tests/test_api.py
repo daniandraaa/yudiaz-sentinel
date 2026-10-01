@@ -216,10 +216,10 @@ def test_team_endpoint(client: TestClient) -> None:
 
     data = payload["data"]
     assert data["organization"] == "Yudiaz Creative Studio"
-    assert data["total_agents"] == 12
+    assert data["total_agents"] == 13
 
     agents = data["agents"]
-    assert len(agents) == 12
+    assert len(agents) == 13
     agent_ids = [a["id"] for a in agents]
 
     required_agents = [

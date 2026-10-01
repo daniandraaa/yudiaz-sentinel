@@ -188,10 +188,10 @@ def test_primary_team_payload():
         r = client.get(f"{PRIMARY_URL}/api/v1/team")
         assert r.status_code == 200
         body = r.json()["data"]
-        assert body["total_agents"] == 12
+        assert body["total_agents"] == 13
         agents = {a["id"]: a for a in body["agents"]}
         expected_agents = [
-            "daffa", "cucurella", "devera", "raziel-hendrix", "kael-ashford", "nara-vasquez",
+            "daffa", "cucurella", "devera", "orca", "raziel-hendrix", "kael-ashford", "nara-vasquez",
             "senna-louviere", "idris-nakamura", "mika-stellan",
             "viktor-moreau", "elara-sinclair", "jovan-aritza"
         ]

@@ -1079,7 +1079,7 @@
                 <div class="w-2.5 h-2.5 rounded-sm bg-purple-400 shadow-[0_0_8px_#C084FC]" aria-hidden="true"></div>
                 <h3 id="agentHubHeading" class="text-xs font-bold tracking-wider uppercase text-platinum font-mono">Yudiaz AI Agent Hub</h3>
               </div>
-              <p class="text-[11px] text-slate-400 mt-0.5">12 Autonomous Personnel (CEO Office & 11 Agents) on Azure Host</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">13 Autonomous Personnel (CEO Office & 12 Agents) on Azure Host</p>
             </div>
 
             <!-- Department Filter Tabs -->
@@ -1354,8 +1354,24 @@
                 </div>
               </div>
             </article>
-
-
+            <!-- 12. Orca (LaTeX Editor - Dedicated for Dimas) -->
+            <article class="agent-card glass-card rounded-xl p-3.5 border border-obsidian-border relative group cursor-pointer ring-1 ring-cyan-500/30" data-dept="support" onclick="inspectAgent('orca')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')inspectAgent('orca')" aria-label="View Orca Profile">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-lg bg-cyan-500/20 border border-cyan-500 flex items-center justify-center text-cyan-400 font-mono font-bold text-sm shadow-[0_0_12px_rgba(6,182,212,0.3)]">
+                  TEX
+                </div>
+                <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span> ONLINE
+                </span>
+              </div>
+              <div class="mt-3">
+                <h4 class="text-sm font-bold text-platinum group-hover:text-cyan-300 transition-colors">Orca</h4>
+                <p class="text-[11px] text-cyan-400 font-mono font-medium">LaTeX Editor (Dimas TA)</p>
+                <div class="mt-2 text-[10px] text-slate-400 line-clamp-2">
+                  LaTeX typesetting maestro, Overleaf/TeX Live troubleshooting, academic proposal drafting dedicated for Dimas.
+                </div>
+              </div>
+            </article>
 
           </div>
 
@@ -1616,7 +1632,20 @@
         soul: "Asisten pribadi CEO Daniandra Prayudisty. Mengatur agenda harian, reminder makan dan nutrisi, monitoring sosial media LinkedIn dan Instagram.",
         quote: "Jadwal Anda sudah saya atur, makan siang jangan lupa."
       },
-                  devera: {
+                        orca: {
+        id: "orca",
+        name: "Orca",
+        role: "LaTeX Editor & Academic Partner",
+        dept: "Academic Publishing & Thesis Support",
+        badge: "TEX",
+        color: "text-cyan-400",
+        border: "border-cyan-400",
+        status: "ACTIVE // COMPILING",
+        bridge: "Hermes Subagent #12 (Latex-Dimas)",
+        soul: "LaTeX Editor handal dan Academic Writing Partner di Yudiaz Creative Studio. Didedikasikan khusus untuk mendampingi Dimas menyusun, memformat, dan mengompilasi Proposal Tugas Akhir (TA) bebas error hingga siap sidang.",
+        quote: "Dimas, fokuskan pikiranmu pada substansi ide dan riset, urusan format LaTeX dan error kompilasi serahkan ke saya."
+      },
+      devera: {
         id: "devera",
         name: "Devera",
         role: "CTO & Accountant",
